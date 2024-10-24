@@ -5,7 +5,7 @@ const Order = () => {
   return (
     <>
    <div className='bg-gray-200'>
-        <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+        <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
           <img
             className='h-full w-full object-cover transition-opacity duration-700'
             src="https://shopgroove.pk/cdn/shop/products/Short-Sleeve-T-Shirt-Men-S-For-2021-Summer-Print-Black-White-Tshirt-Top-Tees-Classic-1.jpg?v=1664899421"

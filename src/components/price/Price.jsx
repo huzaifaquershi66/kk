@@ -6,7 +6,7 @@ const Price = () => {
   return (
     <>
       <div className="bg-gray-100">
-        <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+        <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
           <img
             className='h-full w-full object-cover transition-opacity duration-700'
             src="https://cdn.pixabay.com/photo/2015/05/14/14/01/advertise-766823_1280.jpg"

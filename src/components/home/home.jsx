@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import QuickOrderForm from '../nextcomp/quickorderform';
 import Services from "../nextcomp/services"
 import Reviews from '../nextcomp/reviews';
+import Link from "react-router-dom"
 
 const images = [
   'https://cdn.pixabay.com/photo/2016/08/12/00/38/title-1587327_1280.jpg',
@@ -13,53 +14,73 @@ const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
 
+  const animationDuration =5000; // 3 seconds for both image and text
+
+  
   useEffect(() => {
-    const intervalId = setInterval(() => {
-      setIsAnimating(true);
+    const interval = setInterval(() => {
+      // Show white background when changing the image
+ // Show white background
+
+      // Update image and text after 2 seconds
       setTimeout(() => {
         setCurrentIndex((prevIndex) => (prevIndex + 1) % images.length);
-        setIsAnimating(false);
-      }, 1000); // Animation duration
-    }, 5000); // Change image every 5 seconds
+      }, 3000); // Keep white background for 3 seconds
 
-    return () => clearInterval(intervalId); // Cleanup interval on component unmount
-  }, []);
+      // Hide white background after the image has changed
+      setTimeout(() => {
+        // setIsAnimating(false); // Hide white background
+      }, 7000); // 3 seconds for white background + 1 second delay
+    }, 7000); // Change image every 8 seconds
+
+    return () => clearInterval(interval);
+  }, [images.length]); // Ensure it works with the number of images
 
   return (
     <>
     <div className="bg-gray-50">
-      <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
-        {/* Image Slider */}
-        <img
-          className='h-full w-full object-cover transition-opacity duration-700 m-0 p-0 '
-          src={images[currentIndex]}
-          alt='Slider Image'
-        />
+    <div className='h-[490px] w-full overflow-hidden relative m-0 p-0'>
+  {/* Image Slider */}
+  <img
+    className={`h-full w-full object-cover transition-opacity duration-[1000ms] ease-in-out ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
+    src={images[currentIndex]}
+    alt='Slider Image'
+  />
+  <img
+    className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-[1000ms] ease-in-out ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
+    src={images[(currentIndex + 1) % images.length]} // Next image
+    alt='Next Slider Image'
+  />
 
-        {/* Dark Overlay */}
-        <div className="absolute inset-0 bg-black bg-opacity-50 rounded-lg"></div>
 
-        {/* Taglines */}
-        <div className={`absolute inset-0 flex flex-col items-center justify-center text-center transition-transform duration-1000 ${isAnimating ? 'scale-75 opacity-0' : 'scale-100 opacity-100'} ease-in-out`}>
-          <h2 className="text-white font-poppins text-[35px] sm:text-[50px] md:text-[60px] lg:text-[75px] xl:text-[90px] z-50 font-extrabold drop-shadow-lg leading-tight px-6 animate-bounce">
-            Best Prices, <br /> Fast Turnaround
-          </h2>
-          <h3 className="text-white font-sans text-[16px] sm:text-[18px] md:text-[20px] lg:text-[22px] xl:text-[24px] z-50 font-semibold drop-shadow-md leading-relaxed px-4 mt-4">
-            100% satisfaction—7StarDigitizing delivers excellence in every stitch
-          </h3>
-        </div>
+
+      {/* White Background Overlay */}
+      <div className={`absolute inset-0 ${isAnimating ? 'bg-white opacity-100 transition-opacity duration-1000' : 'opacity-0'} rounded-lg z-10`}></div>
+
+      {/* Taglines and Buttons */}
+      <div className={`absolute inset-0 flex flex-col items-center justify-center text-center`}>
+        <h2 className={`text-reveal fade-in-out font-poppins text-[35px] sm:text-[50px] md:text-[60px] lg:text-[75px] xl:text-[90px] font-extrabold px-6`}>
+          Best Prices, <br /> Fast Turnaround
+        </h2>
+        <h3 className={`text-reveal fade-in-out font-sans text-[16px] sm:text-[18px] md:text-[20px] lg:text-[22px] xl:text-[24px] font-semibold px-4 mt-4`}>
+          100% satisfaction—7StarDigitizing delivers excellence in every stitch
+        </h3>
 
         {/* Button Section */}
-        <div className="absolute inset-x-0 bottom-10 flex justify-center space-x-4">
-          <button className="bg-indigo-600 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow-lg transform transition duration-300 hover:bg-indigo-700 hover:shadow-xl active:scale-95 animate-bounce">
+        <div className="flex justify-center space-x-4 mt-4 fade-in-out">
+          <Link to="/about">
+          <button className="bg-indigo-600 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow-lg">
             About Us
           </button>
-          <button className="bg-indigo-600 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow-lg transform transition duration-300 hover:bg-indigo-700 hover:shadow-xl active:scale-95 animate-bounce">
+          </Link>
+          <Link to="/contact">
+          <button className="bg-indigo-600 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow-lg">
             Contact Us
           </button>
+          </Link>
         </div>
       </div>
-
+    </div>
       {/* Who We Are Section */}
       {/* <div className="bg-gray-100 text-gray-900 p-12 rounded-lg shadow-lg my-0 transition-transform duration-500 transform hover:scale-105 hover:shadow-xl relative overflow-hidden">
       <div className="bg-blue-200 text-gray-800 md:h-36 h-20 p-4 md:p-8 rounded-lg shadow-lg my-10 transition-transform duration-300 hover:scale-105 hover:shadow-xl animate-bounce animate-pulse">

@@ -20,7 +20,7 @@ const ContactUs = () => {
 
   return (
     <>
-    <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+    <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
     <img
       className='h-full w-full object-cover transition-opacity duration-700'
       src="https://t3.ftcdn.net/jpg/06/08/82/50/360_F_608825085_MuQopoWCJQJ8BUa4u2z1DECXtkuoVLmj.jpg"

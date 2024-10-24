@@ -3,7 +3,7 @@ import React from 'react'
 const Aboutus = () => {
   return (
     <>
-      <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+      <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
         <img
           className='h-full w-full object-cover transition-opacity duration-700'
           src="https://blog.meridianhomesinc.com/hs-fs/hubfs/Designing%20and%20Building%20A%20Custom%20Home%20-%20Design%20Phase.jpg?width=800&height=600&name=Designing%20and%20Building%20A%20Custom%20Home%20-%20Design%20Phase.jpg"

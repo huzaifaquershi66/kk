@@ -3,7 +3,7 @@ import React from 'react';
 const PrivacyPolicy = () => {
   return (
     <>
-       <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+       <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
         <img
           className='h-full w-full object-cover transition-opacity duration-700'
           src="https://www.securitymagazine.com/ext/resources/Issues/2019/July/SEC0719-Privacy-Feat-slide1_900px.jpg"

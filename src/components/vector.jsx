@@ -5,25 +5,23 @@ const Vector = () => {
   return (
     <>
       <div className='bg-gray-200'>
-        <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+        <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
           <img
             className='h-full w-full object-cover transition-opacity duration-700'
             src="https://www.unite.ai/wp-content/uploads/2023/05/AI-Graphic-design-tools.png"
             alt='Slider Image'
           />
           <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-            <h2 className="text-4xl font-bold text-white bg-black bg-opacity-70 p-8 rounded-lg shadow-lg transform transition-transform duration-300 hover:scale-105">
-              Vector Now
-            </h2>
-          </div>
-        </div>
+            <h2 className="text-4xl font-bold text-white">Vector Design Tools</h2>
 
-        {/* Description Paragraph */}
-        <div className="text-center mt-4 p-4 bg-black bg-opacity-50 rounded-lg shadow-lg">
-          <p className="text-lg font-bold text-white">
-            Create stunning vector designs effortlessly with our advanced tools.
-            Enjoy a seamless experience from concept to completion!
-          </p>
+            {/* Description Paragraph */}
+            <div className="text-center mt-4 p-4 bg-black bg-opacity-50 rounded-lg shadow-lg">
+              <p className="text-lg font-bold text-white">
+                Create stunning vector designs effortlessly with our advanced tools.
+                Enjoy a seamless experience from concept to completion!
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Image Gallery Section */}

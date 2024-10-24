@@ -13,6 +13,11 @@ import Contact from './components/contact';
 import TermsAndConditions from './components/Terms';
 import PreviousMap from 'postcss/lib/previous-map';
 import Privacy from './components/Privacy';
+import OrderDashboard from './components/Dashboard';
+import store from './components/store/store';
+import { Provider } from 'react-redux';
+import Login from './components/Login';
+import Signup from './components/Signup';
 // Create the router
 const router = createBrowserRouter([
   {
@@ -55,7 +60,20 @@ const router = createBrowserRouter([
    
    
     ],
+   
   },
+  {
+    path:"/admin",
+    element:<OrderDashboard/>
+  },
+  {
+    path:"/login",
+    element:<Login/>
+  },
+  {
+    path:"/signup",
+    element:<Signup/>
+  }
 ]);
 
 const Main = () => {
@@ -67,7 +85,9 @@ const Main = () => {
 // Render the application
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
+  <Provider store={store}>
   <React.StrictMode>
     <Main /> {/* Main component ko yahan render karein */}
   </React.StrictMode>
+  </Provider>
 );

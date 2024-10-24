@@ -3,7 +3,7 @@ import React from 'react';
 const TermsAndConditions = () => {
   return (
     <>
-    <div className='h-[600px] w-full overflow-hidden relative m-0 p-0'>
+    <div className='h-[300px] w-full overflow-hidden relative m-0 p-0'>
     <img
       className='h-full w-full object-cover transition-opacity duration-700'
       src="https://www.dynamicptmichigan.com/wp-content/uploads/2021/10/TC-1.png"

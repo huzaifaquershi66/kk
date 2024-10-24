@@ -1,9 +1,13 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUser, faEnvelope, faPhone, faUpload } from "@fortawesome/free-solid-svg-icons";
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import Login from '../Login'; // Adjust the import path
+import Signup from '../Signup'; // Import Signup component
 
 const QuickOrderForm = () => {
-  const [step, setStep] = useState(1);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const [showLogin, setShowLogin] = useState(false);
+  const [showSignup, setShowSignup] = useState(false); // New state for showing signup
   const [formData, setFormData] = useState({
     designName: "",
     customerName: "",
@@ -18,6 +22,8 @@ const QuickOrderForm = () => {
     file: null,
     selectedColor: 1, // Default color option
   });
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const colorOptions = [
     { colors: 1, price: 8 },
@@ -54,29 +60,59 @@ const QuickOrderForm = () => {
     });
   };
 
-  const handleNext = () => {
-    if (step < 4) setStep(step + 1);
-  };
-
-  const handlePrev = () => {
-    if (step > 1) setStep(step - 1);
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
+    if (!isAuthenticated) {
+      setShowLogin(true);
+      return; // Prevent form submission if not authenticated
+    }
     console.log(formData);
+    // Handle form submission logic here
   };
 
+
+  const handleLoginRedirect = () => {
+    navigate('/login');
+   // Redirect to login page
+  };
+  console.log(isAuthenticated);
+
   return (
-    <div className="flex flex-col items-center justify-center bg-gradient-to-br from-blue-100 to-purple-300 min-h-screen p-10 font-sans">
-      <div className="w-full max-w-4xl bg-white p-10 shadow-lg rounded-2xl transition-transform transform hover:scale-105 hover:shadow-2xl">
-        <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
-          Quick Vector Form
-        </h2>
-        <form onSubmit={handleSubmit}>
-          {step === 1 && (
-            <div>
-              {/* Design Name */}
+    <>
+      {/* {showLogin && <Login onClose={() => setShowLogin(false)} />}
+      {showSignup && <Signup onClose={() => setShowSignup(false)} />} Render Signup if showSignup is true */}
+     {!isAuthenticated ? (
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
+    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+      <h2 className="text-3xl font-bold text-gray-800 mb-6">
+        Please log in to access the Quick Order Form
+      </h2>
+      <div className="flex justify-center space-x-4">
+        <button 
+          onClick={handleLoginRedirect} 
+          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
+        >
+          Login
+        </button>
+      
+        
+      </div>
+      <p className="mt-6 text-sm text-gray-600">
+        Don't have an account yet? Signup now to get started!
+      </p>
+    </div>
+  </div>
+) : (
+  // Authenticated view
+
+
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
+          <div className="w-full bg-white p-10 shadow-lg rounded-2xl">
+            <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
+              Quick Vector Form
+            </h2>
+            <form onSubmit={handleSubmit}>
+              {/* Step 1: Design Name */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Design Name *
               </label>
@@ -89,40 +125,40 @@ const QuickOrderForm = () => {
                 placeholder="Enter Design Name"
                 required
               />
+{/* Step 2 & 3: Customer Name and Customer Email */}
+{!isAuthenticated && (
+  <>
+    {/* Step 2: Customer Name */}
+    <label className="block font-semibold font-raleway text-gray-800 mb-1">
+      Customer Name *
+    </label>
+    <input
+      type="text"
+      name="customerName"
+      className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+      value={formData.customerName}
+      onChange={handleChange}
+      placeholder="Enter Customer Name"
+      required
+    />
 
-              {/* Customer Name */}
-              <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                Customer Name *
-              </label>
-              <input
-                type="text"
-                name="customerName"
-                className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
-                value={formData.customerName}
-                onChange={handleChange}
-                placeholder="Enter Customer Name"
-                required
-              />
-            </div>
-          )}
+    {/* Step 3: Customer Email */}
+    <label className="block font-semibold font-raleway text-gray-800 mb-1">
+      Customer Email *
+    </label>
+    <input
+      type="email"
+      name="customerEmail"
+      className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+      value={formData.customerEmail}
+      onChange={handleChange}
+      placeholder="Enter Customer Email"
+      required
+    />
+  </>
+)}
 
-          {step === 2 && (
-            <div>
-              {/* Customer Email */}
-              <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                Customer Email *
-              </label>
-              <input
-                type="email"
-                name="customerEmail"
-                className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
-                value={formData.customerEmail}
-                onChange={handleChange}
-                placeholder="Enter Customer Email"
-                required
-              />
-
-              {/* Phone Number */}
+              {/* Step 4: Phone Number */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Phone Number
               </label>
@@ -134,12 +170,8 @@ const QuickOrderForm = () => {
                 onChange={handleChange}
                 placeholder="Enter Phone Number"
               />
-            </div>
-          )}
 
-          {step === 3 && (
-            <div>
-              {/* Size in Inches */}
+              {/* Step 5: Size in Inches */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Size in Inches
               </label>
@@ -162,7 +194,7 @@ const QuickOrderForm = () => {
                 />
               </div>
 
-              {/* Select Color Options */}
+              {/* Step 6: Select Color Options */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Select Color Options *
               </label>
@@ -180,7 +212,7 @@ const QuickOrderForm = () => {
                 ))}
               </select>
 
-              {/* Upload File */}
+              {/* Step 7: Upload File */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Upload File *
               </label>
@@ -190,12 +222,12 @@ const QuickOrderForm = () => {
                 accept=".cdr,.ai,.eps,.wmf,.jpg,.bmp,.pdf"
                 onChange={handleFileChange}
                 required
-                className="border border-gray-300 rounded-lg p-2 mb-5"
+                className="border border-gray-300 rounded-lg p-2 mb-5 w-full"
               />
 
-              {/* File Format Selection */}
+              {/* Step 8: File Format Selection */}
               <label className="block font-semibold text-gray-800 mb-1">
-                Select  Format *
+                Select Format *
               </label>
               <select
                 name="format"
@@ -211,20 +243,20 @@ const QuickOrderForm = () => {
                 ))}
               </select>
 
-              {/* Expected Delivery Date */}
+              {/* Step 9: Expected Delivery Date */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Expected Delivery Date *
               </label>
               <input
                 type="date"
                 name="expectedDelivery"
-                className="w-full p-4 border font-raleway border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+                className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
                 value={formData.expectedDelivery}
                 onChange={handleChange}
                 required
               />
 
-              {/* Comments */}
+              {/* Step 10: Additional Comments */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Comments
               </label>
@@ -233,30 +265,21 @@ const QuickOrderForm = () => {
                 className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
                 value={formData.comments}
                 onChange={handleChange}
-                placeholder="Add any comments or instructions..."
-              />
-            </div>
-          )}
+                placeholder="Add any comments or additional information here"
+                rows="4"
+              ></textarea>
 
-          <div className="flex justify-between mt-6">
-            {step > 1 && (
-              <button type="button" onClick={handlePrev} className="bg-gray-500 text-white px-4 py-2 rounded-lg">
-                Back
-              </button>
-            )}
-            {step < 3 ? (
-              <button type="button" onClick={handleNext} className="bg-purple-600 text-white px-4 py-2 rounded-lg">
-                Next
-              </button>
-            ) : (
-              <button type="submit" className="bg-purple-600 text-white px-4 py-2 rounded-lg">
+              <button
+                type="submit"
+                className="w-full bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition duration-200"
+              >
                 Submit Order
               </button>
-            )}
+            </form>
           </div>
-        </form>
-      </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 
