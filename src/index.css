@@ -1,0 +1,115 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Universal Reset for All Elements */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Ensure no horizontal overflow */
+body, html {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+
+body {
+  overflow-x: hidden;
+}
+
+.bg1{
+  background-color: #f3f3f4;
+}
+
+.color1{
+  color: #525252;
+}
+
+.color2{
+  background-color:  #e74901;
+}
+.color3{
+  color:  #e74901;
+}
+.backing {
+  /* Start off-screen */
+  
+   /* background-color: #3a3b3c; */
+   transform: translateX(-100%); /* Start off-screen */
+   transition: transform 0.3s ease-in-out;
+ }
+ 
+ .backing.show {
+   transform: translateX(0); /* Move into view */
+ }
+
+
+ @keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease forwards;
+}
+
+
+.bg2{
+  background-color: #777777;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+@keyframes swing {
+  0%, 100% { transform: rotate(0); }
+  50% { transform: rotate(5deg); }
+}
+
+.animate-pulse {
+  animation: pulse 1s infinite;
+}
+
+.animate-shake {
+  animation: shake 0.5s infinite;
+}
+
+.animate-swing {
+  animation: swing 1s infinite;
+}
