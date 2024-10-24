@@ -102,7 +102,9 @@ const Header = () => {
                   item === "Order Now" ? "/order" :
                   item === "Vector Now" ? "/vector" :
                   item === "Contact Us" ? "/contact" :
-                  item === "Terms and Conditions" ? "/terms" :
+                  item === "Terms & Conditions" ? "/terms" :
+
+          
                   item === "Privacy Policy" ? "/privacy" :
                   "#"
                 }
