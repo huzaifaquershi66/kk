@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useLocation, Link } from 'react-router-dom'; // Import Link from react-router-dom
+import { useLocation, Link } from 'react-router-dom'; 
+import { useEffect } from 'react';// Import Link from react-router-dom
 
 const Header = () => {
   const [toggleform, settoggleform] = useState(false);
@@ -20,7 +21,19 @@ const Header = () => {
     }
     return 'text-white'; // Default class for other links
   };
-
+  useEffect(() => {
+    if (toggleform) {
+      document.body.style.overflow = 'hidden'; // Scroll ko disable karein
+      document.body.style.position = 'fixed'; // Body ki position ko fixed karein
+    } else {
+      document.body.style.overflow = 'auto'; // Scroll ko enable karein
+      document.body.style.position = 'relative'; // Position ko reset karein
+    }
+    return () => {
+      document.body.style.overflow = 'auto'; // Cleanup
+      document.body.style.position = 'relative'; // Cleanup
+    };
+  }, [toggleform]);
   return (
     <>
       <header className="bg-gradient-to-r from-black to-gray-800 text-white shadow-lg">
