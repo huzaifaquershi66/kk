@@ -140,36 +140,27 @@ body {
 @keyframes revealText {
   0% {
     left: 0;
-    opacity: 0.5;
-    transform: translateX(0) scale(1);
-    filter: blur(4px); /* Start with blur */
-    text-shadow: none; /* No shadow initially */
+    opacity: 1; /* Visible */
   }
-  20% {
-    left: 0;
-    opacity: 1;
-    transform: translateX(0) scale(1.1); /* Slight zoom for emphasis */
-    filter: blur(0px); /* Clear blur */
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); /* Add glow effect */
+  10% {
+    left: 0; /* Keep it at start */
+    opacity: 1; /* Fully visible */
+  }
+  90% {
+    left: -100%; /* Move off screen to left */
+    opacity: 1; /* Still visible */
   }
   100% {
-    left: -100%;
-    opacity: 0;
-    transform: translateX(-100%) scale(1); /* Move out of view */
-    filter: blur(4px); /* Blur as it disappears */
-    text-shadow: none; /* Remove glow */
+    left: -100%; /* Keep it off screen */
+    opacity: 0; /* Fully hidden */
   }
 }
 
 .text-reveal {
   position: relative;
   display: inline-block;
-  color: white; /* Pure white text */
-  font-size: 22px; /* Smaller font size */
-  font-weight: bold;
-  letter-spacing: 3px; /* Adjusted spacing for smaller text */
-  text-transform: uppercase;
-  overflow: hidden;
+  color: white;
+  overflow: hidden; /* Ensures the white overlay doesn't overflow outside */
 }
 
 .text-reveal::before {
@@ -179,30 +170,28 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, #ff7e5f, #feb47b, #43cea2, #185a9d); /* Smooth gradient with more colors */
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.6); /* Bigger shadow for more depth */
-  filter: blur(2px); /* Subtle blur effect for the background */
+  background-color: rgb(255, 255, 255);
   z-index: 10;
-  animation: revealText 6s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-  animation-iteration-count: infinite;
+  animation: revealText 4s ease infinite; /* Animation duration for white background */
 }
 
 @keyframes fadeAnimation {
-  0%, 100% {
-    opacity: 0;
-    transform: scale(1);
-    filter: blur(4px); /* Blur at start and end */
+  0%, 20% {
+    opacity: 1; /* Fully visible */
   }
-  10%, 90% {
-    opacity: 1;
-    transform: scale(1.1); /* Slight zoom-in */
-    filter: blur(0px); /* Clear blur in the middle */
+  20%, 80% {
+    opacity: 0; /* Fully hidden */
+  }
+  80%, 100% {
+    opacity: 1; /* Fully visible again for the next cycle */
   }
 }
 
 .fade-in-out {
-  animation: fadeAnimation 8s ease infinite;
+  animation: fadeAnimation 4s ease infinite; /* Keep text visible longer */
 }
+
+
 
 
 .image-slider {

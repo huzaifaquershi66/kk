@@ -75,28 +75,7 @@ const QuickOrderForm = () => {
 
   return (
     <>
-     {!isAuthenticated ? (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">
-        Please log in to access the Quick Order Form
-      </h2>
-      <div className="flex justify-center space-x-4">
-        <button 
-          onClick={handleLoginRedirect} 
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-        >
-          Login
-        </button>
-      
-        
-      </div>
-      <p className="mt-6 text-sm text-gray-600">
-        Don't have an account yet? Signup now to get started!
-      </p>
-    </div>
-  </div>
-) : (
+  
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
       <div className="w-full bg-white p-10 shadow-lg rounded-2xl"> {/* Removed max-w for full screen width */}
         <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
@@ -308,7 +287,7 @@ const QuickOrderForm = () => {
         </form>
       </div>
     </div>
-   )}
+
    </>
  );
 };

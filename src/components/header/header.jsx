@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
-import { useLocation, Link } from 'react-router-dom'; 
-import { useEffect } from 'react';// Import Link from react-router-dom
+import { useLocation, Link } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const Header = () => {
   const [toggleform, settoggleform] = useState(false);
   const location = useLocation(); // To get the current route
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
 
   const handletoggleform = () => {
     console.log("Toggling form", toggleform);
@@ -14,13 +15,13 @@ const Header = () => {
   };
 
   const isActive = (path) => {
-  
     // Check if the current path matches the link path
     if (location.pathname === path) {
       return 'text-red-600'; // Active class for current page
     }
     return 'text-white'; // Default class for other links
   };
+
   useEffect(() => {
     if (toggleform) {
       document.body.style.overflow = 'hidden'; // Scroll ko disable karein
@@ -34,32 +35,35 @@ const Header = () => {
       document.body.style.position = 'relative'; // Cleanup
     };
   }, [toggleform]);
+
   return (
     <>
       <header className="bg-gradient-to-r from-black to-gray-800 text-white shadow-lg">
-        <div className="container mx-auto flex justify-between items-center p-4 ">
+        <div className="container mx-auto flex justify-between items-center p-4">
           {/* Navigation Links */}
           <nav className="xl:flex space-x-10 hidden">
-  {[
-    { name: "Home", path: "/" },
-    { name: "About Us", path: "/about" },
-    { name: "Price", path: "/price" },
-    { name: "Order Now", path: "/order" },
-    { name: "Vector Now", path: "/vector" },
-    { name: "Contact Us", path: "/contact" },
-    { name: "Terms and Conditions", path: "/terms" },
-    { name: "Privacy Policy", path: "/privacy" }
-  ].map((item) => (
-    <Link 
-      to={item.path}
-      className={`text-lg whitespace-nowrap font-helveticaLight font-bold transition duration-300 hover:text-orange-400 relative after:content-[''] after:block after:w-0 after:h-0.5 after:bg-orange-400 after:transition-all after:duration-300 hover:after:w-full ${isActive(item.path)}`}
-      key={item.name}
-    >
-      {item.name}
-    </Link>
-  ))}
-</nav>
-
+            {[
+              { name: "Home", path: "/" },
+              { name: "About Us", path: "/about" },
+              { name: "Price", path: "/price" },
+              {
+                name: isAuthenticated ? "Order Now" : "Login for Order",
+                path: isAuthenticated ? "/order" : "/login"
+              },
+              ...(isAuthenticated ? [{ name: "Vector Now", path: "/vector" }] : []),
+              { name: "Contact Us", path: "/contact" },
+              { name: "Terms and Conditions", path: "/terms" },
+              { name: "Privacy Policy", path: "/privacy" }
+            ].map((item) => (
+              <Link
+                to={item.path}
+                className={`text-lg whitespace-nowrap font-helveticaLight font-bold transition duration-300 hover:text-orange-400 relative after:content-[''] after:block after:w-0 after:h-0.5 after:bg-orange-400 after:transition-all after:duration-300 hover:after:w-full ${isActive(item.path)}`}
+                key={item.name}
+              >
+                {item.name}
+              </Link>
+            ))}
+          </nav>
 
           <div onClick={handletoggleform} className='h-12 w-16 px-[15px] py-[6px] color2 xl:invisible visible'>
             <FontAwesomeIcon icon={faBars} className='text-[35px] cursor-pointer' />
@@ -67,10 +71,10 @@ const Header = () => {
 
           {/* Get a Quote Button */}
           <div className="ml-auto mb-2">
-            <Link to="/order">
-            <button className="color2 whitespace-nowrap text-white font-raleway text-[21px] px-8 py-3 rounded-md shadow-md hover:bg-orange-600 transition duration-300 h-16 text-lg flex items-center justify-center">
-              Get a Quote
-            </button>
+            <Link to={isAuthenticated ? "/order" : "/login"}>
+              <button className="color2 whitespace-nowrap text-white font-raleway text-[21px] px-8 py-3 rounded-md shadow-md hover:bg-orange-600 transition duration-300 h-16 text-lg flex items-center justify-center">
+                {isAuthenticated ? "Order Now" : "Login for Order"}
+              </button>
             </Link>
           </div>
         </div>
@@ -105,7 +109,16 @@ const Header = () => {
 
           {/* Navigation Options */}
           <div className='flex flex-col space-y-4 my-4 mr-8'>
-            {["Home", "About Us", "Price", "Order Now", "Vector Now", "Contact Us", "Terms & Conditions", "Privacy Policy"].map((item) => (
+            {[
+              "Home", 
+              "About Us", 
+              "Price", 
+              isAuthenticated ? "Order Now" : "Login for Order", 
+              ...(isAuthenticated ? ["Vector Now"] : []), 
+              "Contact Us", 
+              "Terms & Conditions", 
+              "Privacy Policy"
+            ].map((item) => (
               <Link 
                 key={item} 
                 to={
@@ -116,9 +129,8 @@ const Header = () => {
                   item === "Vector Now" ? "/vector" :
                   item === "Contact Us" ? "/contact" :
                   item === "Terms & Conditions" ? "/terms" :
-
-          
                   item === "Privacy Policy" ? "/privacy" :
+                  item === "Login for Order"?"/login":
                   "#"
                 }
                 onClick={() => settoggleform(false)}

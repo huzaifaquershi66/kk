@@ -12,23 +12,22 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // localStorage me user data ko save karna
     localStorage.setItem('user', JSON.stringify(formData));
     alert('Signup successful!');
-    navigate('/login'); // Signup ke baad user ko login page par redirect karna
+    navigate('/login');
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4">Signup</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600">
+      <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-8 w-96">
+        <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Signup</h2>
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           placeholder="Email"
-          className="border border-gray-300 p-2 rounded mb-4 w-full"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
@@ -37,7 +36,7 @@ const Signup = () => {
           value={formData.username}
           onChange={handleChange}
           placeholder="Username"
-          className="border border-gray-300 p-2 rounded mb-4 w-full"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
@@ -46,10 +45,10 @@ const Signup = () => {
           value={formData.password}
           onChange={handleChange}
           placeholder="Password"
-          className="border border-gray-300 p-2 rounded mb-4 w-full"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full">
+        <button type="submit" className="bg-blue-600 text-white p-3 rounded-lg w-full hover:bg-blue-700 transition duration-200">
           Signup
         </button>
       </form>

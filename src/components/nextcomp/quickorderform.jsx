@@ -81,29 +81,8 @@ const QuickOrderForm = () => {
     <>
       {/* {showLogin && <Login onClose={() => setShowLogin(false)} />}
       {showSignup && <Signup onClose={() => setShowSignup(false)} />} Render Signup if showSignup is true */}
-     {!isAuthenticated ? (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
-    <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
-      <h2 className="text-3xl font-bold text-gray-800 mb-6">
-        Please log in to access the Quick Order Form
-      </h2>
-      <div className="flex justify-center space-x-4">
-        <button 
-          onClick={handleLoginRedirect} 
-          className="bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-2 rounded-lg transition duration-300 ease-in-out shadow-md transform hover:scale-105"
-        >
-          Login
-        </button>
-      
-        
-      </div>
-      <p className="mt-6 text-sm text-gray-600">
-        Don't have an account yet? Signup now to get started!
-      </p>
-    </div>
-  </div>
-) : (
-  // Authenticated view
+
+
 
 
         <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
@@ -278,7 +257,7 @@ const QuickOrderForm = () => {
             </form>
           </div>
         </div>
-      )}
+   
     </>
   );
 };

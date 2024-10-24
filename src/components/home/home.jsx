@@ -30,8 +30,8 @@ const Home = () => {
       // Hide white background after the image has changed
       setTimeout(() => {
         // setIsAnimating(false); // Hide white background
-      }, 7000); // 3 seconds for white background + 1 second delay
-    }, 7000); // Change image every 8 seconds
+      }, 4000); // 3 seconds for white background + 1 second delay
+    }, 4000); // Change image every 8 seconds
 
     return () => clearInterval(interval);
   }, [images.length]); // Ensure it works with the number of images
@@ -39,23 +39,16 @@ const Home = () => {
   return (
     <>
     <div className="bg-gray-50">
-    <div className='h-[490px] w-full overflow-hidden relative m-0 p-0'>
-  {/* Image Slider */}
-  <img
-    className={`h-full w-full object-cover transition-opacity duration-[1000ms] ease-in-out ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
-    src={images[currentIndex]}
-    alt='Slider Image'
-  />
-  <img
-    className={`absolute top-0 left-0 h-full w-full object-cover transition-opacity duration-[1000ms] ease-in-out ${isAnimating ? 'opacity-100' : 'opacity-0'}`}
-    src={images[(currentIndex + 1) % images.length]} // Next image
-    alt='Next Slider Image'
-  />
-
-
+    <div className='h-[470px] w-full overflow-hidden relative m-0 p-0'>
+      {/* Image Slider */}
+      <img
+        className={`h-full w-full object-cover transition-opacity duration-[1000ms] ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
+        src={images[currentIndex]}
+        alt='Slider Image'
+      />
 
       {/* White Background Overlay */}
-      <div className={`absolute inset-0 ${isAnimating ? 'bg-white opacity-100 transition-opacity duration-1000' : 'opacity-0'} rounded-lg z-10`}></div>
+      <div className={`absolute inset-0 ${isAnimating ? 'opacity-100 transition-opacity duration-2000' : 'opacity-0'} rounded-lg z-10`}></div>
 
       {/* Taglines and Buttons */}
       <div className={`absolute inset-0 flex flex-col items-center justify-center text-center`}>
@@ -68,16 +61,12 @@ const Home = () => {
 
         {/* Button Section */}
         <div className="flex justify-center space-x-4 mt-4 fade-in-out">
-          <Link to="/about">
           <button className="bg-indigo-600 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow-lg">
             About Us
           </button>
-          </Link>
-          <Link to="/contact">
           <button className="bg-indigo-600 text-white font-semibold text-lg px-6 py-3 rounded-lg shadow-lg">
             Contact Us
           </button>
-          </Link>
         </div>
       </div>
     </div>
