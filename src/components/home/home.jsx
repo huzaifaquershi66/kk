@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import QuickOrderForm from '../nextcomp/quickorderform';
 import Services from "../nextcomp/services"
 import Reviews from '../nextcomp/reviews';
-import Link from "react-router-dom"
+import { Link } from 'react-router-dom';
 
 const images = [
   'https://cdn.pixabay.com/photo/2016/08/12/00/38/title-1587327_1280.jpg',
