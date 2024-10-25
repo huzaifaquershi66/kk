@@ -138,7 +138,7 @@ const QuickOrderForm = () => {
 )}
 
               {/* Step 4: Phone Number */}
-              <label className="block font-semibold font-raleway text-gray-800 mb-1">
+              {/* <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Phone Number
               </label>
               <input
@@ -148,7 +148,7 @@ const QuickOrderForm = () => {
                 value={formData.phone}
                 onChange={handleChange}
                 placeholder="Enter Phone Number"
-              />
+              /> */}
 
               {/* Step 5: Size in Inches */}
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
@@ -252,7 +252,7 @@ const QuickOrderForm = () => {
                 type="submit"
                 className="w-full bg-blue-600 text-white p-4 rounded-lg hover:bg-blue-700 transition duration-200"
               >
-                Submit Order
+                Checkout
               </button>
             </form>
           </div>

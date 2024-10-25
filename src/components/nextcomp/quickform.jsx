@@ -140,7 +140,7 @@ const QuickOrderForm = () => {
 
         
 
-            <div>
+            {/* <div>
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
                 Phone Number *
               </label>
@@ -153,7 +153,7 @@ const QuickOrderForm = () => {
                 placeholder="Enter Phone Number"
                 required
               />
-            </div>
+            </div> */}
 
             <div>
               <label className="block font-semibold font-raleway text-gray-800 mb-1">
@@ -283,7 +283,7 @@ const QuickOrderForm = () => {
             type="submit"
             className="mt-5 bg-blue-600 font-raleway text-white p-3 rounded-lg w-full"
           >
-            Submit
+          Checkout
           </button>
         </form>
       </div>
