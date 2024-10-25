@@ -31,7 +31,7 @@ const Home = () => {
       setTimeout(() => {
         // setIsAnimating(false); // Hide white background
       }, 4000); // 3 seconds for white background + 1 second delay
-    }, 4000); // Change image every 8 seconds
+    }, 3000); // Change image every 8 seconds
 
     return () => clearInterval(interval);
   }, [images.length]); // Ensure it works with the number of images
@@ -53,7 +53,10 @@ const Home = () => {
       {/* Taglines and Buttons */}
       <div className={`absolute inset-0 flex flex-col items-center justify-center text-center`}>
         <h2 className={`text-reveal fade-in-out font-poppins text-[35px] sm:text-[50px] md:text-[60px] lg:text-[75px] xl:text-[90px] font-extrabold px-6`}>
-          Best Prices, <br /> Fast Turnaround
+          Best Prices, 
+        </h2>
+        <h2 className={`text-reveal fade-in-out my-4 font-poppins text-[35px] sm:text-[50px] md:text-[60px] lg:text-[75px] xl:text-[90px] font-extrabold px-6`}>
+         Fast Turnaround
         </h2>
         <h3 className={`text-reveal fade-in-out font-sans text-[16px] sm:text-[18px] md:text-[20px] lg:text-[22px] xl:text-[24px] font-semibold px-4 mt-4`}>
           100% satisfaction—7StarDigitizing delivers excellence in every stitch

@@ -2,7 +2,14 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const Signup = () => {
-  const [formData, setFormData] = useState({ email: '', username: '', password: '' });
+  const [formData, setFormData] = useState({
+    email: '',
+    username: '',
+    password: '',
+    fullName: '',
+    phone: '',
+    company: ''
+  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -22,6 +29,15 @@ const Signup = () => {
       <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-8 w-96">
         <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Signup</h2>
         <input
+          type="text"
+          name="fullName"
+          value={formData.fullName}
+          onChange={handleChange}
+          placeholder="Full Name"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <input
           type="email"
           name="email"
           value={formData.email}
@@ -36,6 +52,24 @@ const Signup = () => {
           value={formData.username}
           onChange={handleChange}
           placeholder="Username"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <input
+          type="text"
+          name="phone"
+          value={formData.phone}
+          onChange={handleChange}
+          placeholder="Phone Number"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <input
+          type="text"
+          name="company"
+          value={formData.company}
+          onChange={handleChange}
+          placeholder="Company Name"
           className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />

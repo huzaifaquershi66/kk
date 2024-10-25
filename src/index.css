@@ -140,18 +140,30 @@ body {
 @keyframes revealText {
   0% {
     left: 0;
-    opacity: 1; /* Visible */
-  }
-  10% {
-    left: 0; /* Keep it at start */
     opacity: 1; /* Fully visible */
   }
+  10% {
+    left: -2%; /* Very slight movement */
+    opacity: 1; /* Still visible */
+  }
+  25% {
+    left: -15%; /* Slightly off screen */
+    opacity: 1; /* Still visible */
+  }
+  50% {
+    left: -50%; /* Mostly off screen */
+    opacity: 1; /* Still visible */
+  }
+  75% {
+    left: -90%; /* Almost fully off screen */
+    opacity: 1; /* Still visible */
+  }
   90% {
-    left: -100%; /* Move off screen to left */
+    left: -100%; /* Fully off screen */
     opacity: 1; /* Still visible */
   }
   100% {
-    left: -100%; /* Keep it off screen */
+    left: -100%; /* Fully off screen */
     opacity: 0; /* Fully hidden */
   }
 }
@@ -160,7 +172,7 @@ body {
   position: relative;
   display: inline-block;
   color: white;
-  overflow: hidden; /* Ensures the white overlay doesn't overflow outside */
+  overflow: hidden; /* Prevent overflow */
 }
 
 .text-reveal::before {
@@ -172,25 +184,26 @@ body {
   height: 100%;
   background-color: rgb(255, 255, 255);
   z-index: 10;
-  animation: revealText 4s ease infinite; /* Animation duration for white background */
+  animation: revealText 3s linear infinite; /* Linear for consistent speed */
 }
 
 @keyframes fadeAnimation {
-  0%, 20% {
+  0%, 50% {
     opacity: 1; /* Fully visible */
   }
-  20%, 80% {
+  50%, 85% {
     opacity: 0; /* Fully hidden */
   }
-  80%, 100% {
-    opacity: 1; /* Fully visible again for the next cycle */
+  85%, 100% {
+    opacity: 1; /* Fully visible again */
   }
 }
 
 .fade-in-out {
-  animation: fadeAnimation 4s ease infinite; /* Keep text visible longer */
+  animation: fadeAnimation 3s ease-in-out infinite; /* Smooth easing */
+  position: relative;
+  z-index: 20; /* Ensure text is above the background */
 }
-
 
 
 
