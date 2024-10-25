@@ -137,42 +137,67 @@ body {
   z-index: 50;
   color: black;
 }
+
 @keyframes revealText {
   0% {
-    left: 0;
-    opacity: 1; /* Fully visible */
+    opacity: 0; /* Initially hidden */
+    transform: translateX(10%); /* Start slightly off to the right */
   }
-  10% {
-    left: -2%; /* Very slight movement */
-    opacity: 1; /* Still visible */
+  20% {
+    opacity: 0; /* Still hidden while background is fully visible */
+    transform: translateX(10%);
   }
-  25% {
-    left: -15%; /* Slightly off screen */
-    opacity: 1; /* Still visible */
+  30% {
+    opacity: 1; /* Start to show text */
+    transform: translateX(0); /* Move to original position */
   }
   50% {
-    left: -50%; /* Mostly off screen */
-    opacity: 1; /* Still visible */
+    opacity: 1; /* Fully visible */
+    transform: translateX(0); /* Stay in original position */
   }
-  75% {
-    left: -90%; /* Almost fully off screen */
-    opacity: 1; /* Still visible */
+  70% {
+    opacity: 1; /* Stay visible */
+    transform: translateX(0); /* Stay in original position */
+  }
+  80% {
+    opacity: 1; /* Keep text visible for 2-3 seconds */
+    transform: translateX(0); /* Stay in original position */
   }
   90% {
-    left: -100%; /* Fully off screen */
-    opacity: 1; /* Still visible */
+    opacity: 0; /* Begin to fade out */
+    transform: translateX(-10%); /* Move slightly left */
   }
   100% {
-    left: -100%; /* Fully off screen */
     opacity: 0; /* Fully hidden */
+    transform: translateX(-10%);
+  }
+}
+
+@keyframes whiteBackground {
+  0% {
+    opacity: 1; /* Fully visible */
+    transform: translateX(0); /* Start at original position */
+  }
+  20% {
+    opacity: 1; /* Stay fully visible */
+    transform: translateX(0);
+  }
+  80% {
+    opacity: 1; /* Fade out completely */
+    transform: translateX(-100%); /* Slide out to the left */
+  }
+  100% {
+    opacity: 1; /* Keep it opaque after sliding out */
+    transform: translateX(-100%);
   }
 }
 
 .text-reveal {
   position: relative;
   display: inline-block;
-  color: white;
+  color: white; /* Change text color to white */
   overflow: hidden; /* Prevent overflow */
+  animation: revealText 5s ease-in-out infinite; /* Looping text animation */
 }
 
 .text-reveal::before {
@@ -184,28 +209,15 @@ body {
   height: 100%;
   background-color: rgb(255, 255, 255);
   z-index: 10;
-  animation: revealText 3s linear infinite; /* Linear for consistent speed */
-}
-
-@keyframes fadeAnimation {
-  0%, 50% {
-    opacity: 1; /* Fully visible */
-  }
-  50%, 85% {
-    opacity: 0; /* Fully hidden */
-  }
-  85%, 100% {
-    opacity: 1; /* Fully visible again */
-  }
+  animation: whiteBackground 5s ease-in-out infinite; /* Looping background animation */
 }
 
 .fade-in-out {
-  animation: fadeAnimation 3s ease-in-out infinite; /* Smooth easing */
   position: relative;
   z-index: 20; /* Ensure text is above the background */
 }
 
-
+  
 
 .image-slider {
   position: relative;
