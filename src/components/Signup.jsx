@@ -19,7 +19,16 @@ const Signup = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    localStorage.setItem('user', JSON.stringify(formData));
+
+    // Retrieve existing users from local storage
+    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
+    
+    // Add the new user to the existing users array
+    existingUsers.push(formData);
+    
+    // Save the updated users array back to local storage
+    localStorage.setItem('users', JSON.stringify(existingUsers));
+
     alert('Signup successful!');
     navigate('/login');
   };

@@ -39,9 +39,9 @@ const Header = () => {
   return (
     <>
       <header className="bg-gradient-to-r from-black to-gray-800 text-white shadow-lg">
-        <div className="container mx-auto flex justify-between items-center p-4">
+        <div className="container mx-auto flex justify-between items-center p-2">
           {/* Navigation Links */}
-          <nav className="xl:flex space-x-10 hidden">
+          <nav className="xl:flex space-x-8 hidden">
             {[
               { name: "Home", path: "/" },
               { name: "About Us", path: "/about" },
@@ -51,13 +51,14 @@ const Header = () => {
                 path: isAuthenticated ? "/order" : "/login"
               },
               ...(isAuthenticated ? [{ name: "Vector Now", path: "/vector" }] : []),
+              ...(isAuthenticated ? [{ name: "Client Panel", path: "/client" }] : []),
               { name: "Contact Us", path: "/contact" },
               { name: "Terms and Conditions", path: "/terms" },
               { name: "Privacy Policy", path: "/privacy" }
             ].map((item) => (
               <Link
                 to={item.path}
-                className={`text-lg whitespace-nowrap font-helveticaLight font-bold transition duration-300 hover:text-orange-400 relative after:content-[''] after:block after:w-0 after:h-0.5 after:bg-orange-400 after:transition-all after:duration-300 hover:after:w-full ${isActive(item.path)}`}
+                className={`text-[16px] whitespace-nowrap font-helveticaLight font-bold transition duration-300 hover:text-orange-400 relative after:content-[''] after:block after:w-0 after:h-0.5 after:bg-orange-400 after:transition-all after:duration-300 hover:after:w-full ${isActive(item.path)}`}
                 key={item.name}
               >
                 {item.name}
@@ -115,6 +116,7 @@ const Header = () => {
               "Price", 
               isAuthenticated ? "Order Now" : "Login for Order", 
               ...(isAuthenticated ? ["Vector Now"] : []), 
+              ...(isAuthenticated ? ["Client Panel"] : []), 
               "Contact Us", 
               "Terms & Conditions", 
               "Privacy Policy"
@@ -127,6 +129,7 @@ const Header = () => {
                   item === "Price" ? "/price" :
                   item === "Order Now" ? "/order" :
                   item === "Vector Now" ? "/vector" :
+                  item === "Client Panel" ? "/client" :
                   item === "Contact Us" ? "/contact" :
                   item === "Terms & Conditions" ? "/terms" :
                   item === "Privacy Policy" ? "/privacy" :

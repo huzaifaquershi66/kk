@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux'; // Import dispatch from react-redux
-import { login } from './store/authslice'; // Import the login action from Redux slice
+import { useDispatch } from 'react-redux';
+import { login } from './store/authslice';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [error, setError] = useState(''); 
   const navigate = useNavigate();
-  const dispatch = useDispatch(); // Initialize dispatch
+  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -16,10 +16,14 @@ const Login = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    const storedUser = JSON.parse(localStorage.getItem('user'));
 
-    if (storedUser && storedUser.email === formData.email && storedUser.password === formData.password) {
-      // Dispatch login action to update Redux state
+    // Retrieve all users from local storage
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    // Find the user that matches the email and password
+    const storedUser = users.find(user => user.email === formData.email && user.password === formData.password);
+
+    if (storedUser) {
+      // Dispatch login action to update Redux state with the matched user
       dispatch(login(storedUser));
       alert('Login successful!');
       navigate('/order'); 

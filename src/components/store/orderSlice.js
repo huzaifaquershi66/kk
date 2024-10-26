@@ -1,39 +1,45 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState = {
-  formData: {
-    designName: "",
-    customerName: "",
-    customerEmail: "",
-    height: "",
-    width: "",
-    phone: "",
-    colorOptions: "",
-    format: "Corel Draw",
-    expectedDelivery: "",
-    comments: "",
-    file: null,
-    selectedColor: "",
-    fabric: "",
-    location: "",
-    numberOfColors: 1,
-  },
-  step: 1,
+// Load orders from localStorage
+const loadOrdersFromLocalStorage = () => {
+  try {
+    const storedOrders = localStorage.getItem('orders');
+    return storedOrders ? JSON.parse(storedOrders) : []; // Return empty array if not found
+  } catch (error) {
+    console.error('Failed to load orders from localStorage:', error);
+    return [];
+  }
 };
 
 const orderSlice = createSlice({
   name: 'order',
-  initialState,
+  initialState: {
+    orders: loadOrdersFromLocalStorage(),
+  },
   reducers: {
-    setFormData: (state, action) => {
-      state.formData = { ...state.formData, ...action.payload };
+    addOrder(state, action) {
+      state.orders.push(action.payload);
+      localStorage.setItem('orders', JSON.stringify(state.orders));
     },
-    setStep: (state, action) => {
-      state.step = action.payload;
+    updateOrderRushStatus: (state, action) => {
+      const { orderId } = action.payload;
+      const order = state.orders.find(order => order.id === orderId);
+      if (order) {
+        order.isRush = !order.isRush; // Toggle the rush status
+        localStorage.setItem('orders', JSON.stringify(state.orders)); // Update localStorage
+      }
+    },
+    loadOrders: (state, action) => {
+      state.orders = action.payload; // Set orders from payload
     },
   },
 });
 
-export const { setFormData, setStep } = orderSlice.actions;
+// Thunk to fetch orders
+export const fetchOrders = () => (dispatch) => {
+  const orders = loadOrdersFromLocalStorage();
+  dispatch(loadOrders(orders)); // Dispatch loadOrders action with fetched orders
+};
 
+export const { addOrder, updateOrderRushStatus, loadOrders } = orderSlice.actions;
 export default orderSlice.reducer;

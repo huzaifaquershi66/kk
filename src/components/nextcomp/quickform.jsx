@@ -1,34 +1,55 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { setFormData, setStep } from '../store/orderSlice';
 import { useNavigate } from 'react-router-dom';
+import { addOrder } from '../store/orderSlice';
 
 const QuickOrderForm = () => {
   const dispatch = useDispatch();
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
-  const [formData, setFormDataState] = useState({
-    designName: '',
-    customerName: '',
-    customerEmail: '',
-    phone: '',
-    format: '',
-    location: '',
-    file: null,
-    height: '',
-    width: '',
-    colorName: '',
-    numberOfColors: '',
-    fabric: '',
-    expectedDelivery: '',
-    comments: '',
+  const navigate = useNavigate();
+
+  const [formData, setFormDataState] = useState(() => {
+    const savedData = localStorage.getItem('quickOrderForm');
+    return savedData ? JSON.parse(savedData) : {
+      designName: '',
+      customerName: '',
+      customerEmail: '',
+      phone: '',
+      format: 'dst - Tajima', // Default format
+      location: '',
+      file: null,
+      fileUrl: null,
+      height: '',
+      width: '',
+      colorName: '',
+      numberOfColors: '',
+      fabric: '',
+      expectedDelivery: '',
+      comments: '',
+    };
   });
-  const [submissionMessage, setSubmissionMessage] = useState('');
+
+  useEffect(() => {
+    localStorage.setItem('quickOrderForm', JSON.stringify(formData));
+  }, [formData]);
 
   const locationOptions = [
     { value: "LeftChest", price: 8 },
     { value: "CapsPrice", price: 8 },
     { value: "Pocket", price: 8 },
     { value: "JacketBack", price: 35 },
+  ];
+
+  const formatOptions = [
+    { value: "dst - Tajima" },
+    { value: "tap - Happy" },
+    { value: "dsb - Barudan" },
+    { value: "dsz - Zsk" },
+    { value: "emb - Wilcom" },
+    { value: "cnd - Melco, Amaya" },
+    { value: "pes - Brother" },
+    { value: "pxf - Pulse" },
+    { value: "exp - Melco, Amaya" },
   ];
 
   const handleChange = (e) => {
@@ -39,28 +60,67 @@ const QuickOrderForm = () => {
     }));
   };
 
-  const handleFileChange = (e) => {
-    setFormDataState((prevData) => ({
-      ...prevData,
-      file: e.target.files[0],
-    }));
+  const handleFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', 'marketing');
+
+      try {
+        const response = await fetch(`https://api.cloudinary.com/v1_1/dgb4spjyk/upload`, {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        setFormDataState((prevData) => ({
+          ...prevData,
+          file: file,
+          fileUrl: data.secure_url,
+        }));
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+    }
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-  
+
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
-  
+
     const uniqueId = Date.now();
-    const selectedLocation = locationOptions.find(option => option.value === formData.location);
+    const selectedLocation = formData.location
+      ? locationOptions.find(option => option.value === formData.location)
+      : locationOptions[0]; // Default to first location
+
     const price = selectedLocation ? selectedLocation.price : 0;
-  
-    console.log("Selected Location:", formData.location);
-    console.log("Calculated Price:", price);
-  
+    const formatToSubmit = formData.format || 'dst - Tajima';
+
+    const newOrder = {
+      id: uniqueId,
+      designName: formData.designName,
+      customerName: formData.customerName,
+      customerEmail: formData.customerEmail,
+      phone: formData.phone,
+      format: formatToSubmit,
+      location: selectedLocation.value,
+      price: price,
+      height: formData.height,
+      width: formData.width,
+      colorName: formData.colorName,
+      numberOfColors: formData.numberOfColors,
+      fabric: formData.fabric,
+      fileUrl: formData.fileUrl,
+      expectedDelivery: formData.expectedDelivery,
+      comments: formData.comments,
+    };
+
+    dispatch(addOrder(newOrder));
+
     const form = new FormData();
     form.append('sid', '1694715');
     form.append('mode', '2CO');
@@ -68,15 +128,11 @@ const QuickOrderForm = () => {
     form.append('li_0_name', `${formData.designName} ID:-${uniqueId}`);
     form.append('li_0_price', price);
     form.append('li_0_recurrence', 'No');
-  
-    for (const [key, value] of form.entries()) {
-      console.log(key, value);
-    }
-  
+
     const hiddenForm = document.createElement('form');
     hiddenForm.action = "https://www.2checkout.com/checkout/spurchase"; 
     hiddenForm.method = "post";
-  
+
     for (const [key, value] of form.entries()) {
       const input = document.createElement('input');
       input.type = 'hidden';
@@ -84,16 +140,10 @@ const QuickOrderForm = () => {
       input.value = value;
       hiddenForm.appendChild(input);
     }
-  
+
     document.body.appendChild(hiddenForm);
     hiddenForm.submit();
-  
-    // Reset form data
-    // ...
   };
-  
-
-  const navigate = useNavigate();
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
@@ -101,12 +151,6 @@ const QuickOrderForm = () => {
         <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
           Quick Order Form
         </h2>
-
-        {submissionMessage && (
-          <div className="mb-4 p-2 text-green-600 bg-green-200 rounded">
-            {submissionMessage}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -166,15 +210,11 @@ const QuickOrderForm = () => {
                 onChange={handleChange}
                 required
               >
-                <option value="dst - Tajima">dst - Tajima</option>
-                <option value="tap - Happy">tap - Happy</option>
-                <option value="dsb - Barudan">dsb - Barudan</option>
-                <option value="dsz - Zsk">dsz - Zsk</option>
-                <option value="emb - Wilcom">emb - Wilcom</option>
-                <option value="cnd - Melco, Amaya">cnd - Melco, Amaya</option>
-                <option value="pes - Brother">pes - Brother</option>
-                <option value="pxf - Pulse">pxf - Pulse</option>
-                <option value="exp - Melco, Amaya">exp - Melco, Amaya</option>
+                {formatOptions.map(option => (
+                  <option key={option.value} value={option.value}>
+                    {option.value}
+                  </option>
+                ))}
               </select>
             </div>
 

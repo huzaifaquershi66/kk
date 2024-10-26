@@ -13,14 +13,14 @@ import Aboutus from './components/aboutus';
 import Contact from './components/contact';
 import TermsAndConditions from './components/Terms';
 import Privacy from './components/Privacy';
-import OrderDashboard from './components/Dashboard';
+
 import store from './components/store/store';
 import Login from './components/Login';
 import Signup from './components/Signup';
-
+import Client from './components/Clientpanel';
 import './index.css'; // Ensure your CSS is being loaded
 
-
+import Admin from "./components/Admin"
 
 // Create the router
 const router = createBrowserRouter([
@@ -60,12 +60,13 @@ const router = createBrowserRouter([
         path: '/privacy',
         element: <Privacy />,
       },
+      {
+        path: '/client',
+        element: <Client />,
+      },
     ],
   },
-  {
-    path: '/admin',
-    element: <OrderDashboard />,
-  },
+ 
   {
     path: '/login',
     element: <Login />,
@@ -73,6 +74,14 @@ const router = createBrowserRouter([
   {
     path: '/signup',
     element: <Signup />,
+  },
+  {
+    path: '/clientpanel',
+    element: <Client />,
+  },
+  {
+    path: '/adminpanel',
+    element: <Admin />,
   },
 
  
