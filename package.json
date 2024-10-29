@@ -17,6 +17,7 @@
     "@stripe/react-stripe-js": "^2.8.1",
     "@stripe/stripe-js": "^4.9.0",
     "cloudinary-react": "^1.8.1",
+    "dotenv": "^16.4.5",
     "firebase": "^11.0.1",
     "jspdf": "^2.5.2",
     "react": "^18.3.1",
