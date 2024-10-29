@@ -175,8 +175,23 @@ const handleRushChange = async (orderId) => {
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
+   
   };
+   
 
+  useEffect(() => {
+    if (sidebarOpen) {
+      document.body.style.overflow = 'hidden'; // Scroll ko disable karein
+      document.body.style.position = 'fixed'; // Body ki position ko fixed karein
+    } else {
+      document.body.style.overflow = 'auto'; // Scroll ko enable karein
+      document.body.style.position = 'relative'; // Position ko reset karein
+    }
+    return () => {
+      document.body.style.overflow = 'auto'; // Cleanup
+      document.body.style.position = 'relative'; // Cleanup
+    };
+  }, [sidebarOpen]);
  
 
   const generateInvoice = (order) => {
