@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+
 import { useNavigate } from 'react-router-dom';
 import { addVector } from '../store/vectorslice';
 import { db } from '../../../firebase'; // Import your Firebase configuration
@@ -7,7 +7,7 @@ import { collection, addDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth' // Import Firestore functions
 
 const QuickOrderForm = () => {
-  const dispatch = useDispatch();
+
   const auth = getAuth(); // Get the Firebase Auth instance
   const user = auth.currentUser; // Get the currently signed-in user
 
@@ -135,7 +135,7 @@ const QuickOrderForm = () => {
     };
 
     // Dispatch the order to Redux store
-    dispatch(addVector(newOrder));
+    // dispatch(addVector(newOrder));
 
     // Save the order to Firestore
     try {
