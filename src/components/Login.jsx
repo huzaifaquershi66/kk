@@ -1,43 +1,38 @@
+// src/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { login } from './store/authslice';
+import { auth } from '../../firebase'; // Import your firebase configuration
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState(''); 
+  const [error, setError] = useState('');
   const navigate = useNavigate();
-  const dispatch = useDispatch();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Retrieve all users from local storage
-    const users = JSON.parse(localStorage.getItem('users')) || [];
-    // Find the user that matches the email and password
-    const storedUser = users.find(user => user.email === formData.email && user.password === formData.password);
-
-    if (storedUser) {
-      // Dispatch login action to update Redux state with the matched user
-      dispatch(login(storedUser));
+    try {
+      // Sign in with email and password using Firebase
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
       alert('Login successful!');
-      navigate('/order'); 
-    } else {
-      setError('Invalid email or password. Please make sure you are registered.');
+      navigate('/order'); // Redirect to admin panel
+    } catch (error) {
+      setError('Invalid email or password. Please try again.'); // Show error message
     }
   };
 
   const handleSignupRedirect = () => {
-    navigate('/signup');
+    navigate('/signup'); // Redirect to signup page
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600 bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600">
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96">
         <h2 className="text-2xl font-bold mb-4">Login</h2>
         {error && <p className="text-red-500 mb-4">{error}</p>}
@@ -63,7 +58,7 @@ const Login = () => {
           Login
         </button>
         <div className="text-center mt-4">
-          <p>If you are not registered, please signup</p>
+          <p>Don’t have an account?</p>
           <button 
             type="button" 
             onClick={handleSignupRedirect} 

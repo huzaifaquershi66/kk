@@ -1,46 +1,43 @@
-import { createSlice } from '@reduxjs/toolkit';
+// // src/store/authSlice.js
+// import { createSlice } from '@reduxjs/toolkit';
+// import { auth } from '../../firebase'; // Import Firebase auth
+// import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 
-const initialState = {
-  user: Array.isArray(JSON.parse(localStorage.getItem('users'))) ? 
-         JSON.parse(localStorage.getItem('users')) : [], // Ensure users is an array
-  currentUser: null,
-  isAuthenticated: false,
-};
+// const authSlice = createSlice({
+//   name: 'auth',
+//   initialState: { user: null, error: null },
+//   reducers: {
+//     loginSuccess: (state, action) => {
+//       state.user = action.payload;
+//       state.error = null;
+//     },
+//     loginFailure: (state, action) => {
+//       state.error = action.payload;
+//     },
+//     logout: (state) => {
+//       state.user = null;
+//     }
+//   }
+// });
 
-const authSlice = createSlice({
-  name: 'auth',
-  initialState,
-  reducers: {
-    login: (state, action) => {
-      const user = action.payload;
-      state.currentUser = user;
-      state.isAuthenticated = true;
+// export const { loginSuccess, loginFailure, logout } = authSlice.actions;
 
-      // Check if the user is already in the user array
-      const userExists = state.user.find(existingUser => existingUser.id === user.id);
-      if (!userExists) {
-        state.user.push(user); // Add new user to user array
-      }
+// export const login = (email, password) => async (dispatch) => {
+//   try {
+//     const userCredential = await signInWithEmailAndPassword(auth, email, password);
+//     dispatch(loginSuccess(userCredential.user));
+//   } catch (error) {
+//     dispatch(loginFailure(error.message));
+//   }
+// };
 
-      // Save users to localStorage
-      localStorage.setItem('users', JSON.stringify(state.user));
-      localStorage.setItem('currentUser', JSON.stringify(state.currentUser));
-      
-      console.log("Users after login:", state.user); // Debugging log
-    },
-    logout: (state) => {
-      state.currentUser = null;
-      state.isAuthenticated = false;
-      localStorage.removeItem('currentUser'); // Remove current user from localStorage
-    },
-    setAllUsers: (state, action) => {
-      // Set all users from payload or localStorage as a fallback
-      const allUsers = action.payload || JSON.parse(localStorage.getItem('users')) || [];
-      state.user = allUsers;
-      console.log("All users set:", state.user); // Debugging log
-    },
-  },
-});
+// export const signup = (email, password) => async (dispatch) => {
+//   try {
+//     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+//     dispatch(loginSuccess(userCredential.user));
+//   } catch (error) {
+//     dispatch(loginFailure(error.message));
+//   }
+// };
 
-export const { login, logout, setAllUsers } = authSlice.actions;
-export default authSlice.reducer;
+// export default authSlice.reducer;

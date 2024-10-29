@@ -144,7 +144,7 @@ body {
     transform: translateX(10%); /* Start slightly off to the right */
   }
   20% {
-    opacity: 0; /* Still hidden while background is fully visible */
+    opacity: 0; /* Hidden while background is fully visible */
     transform: translateX(10%);
   }
   30% {
@@ -155,12 +155,8 @@ body {
     opacity: 1; /* Fully visible */
     transform: translateX(0); /* Stay in original position */
   }
-  70% {
-    opacity: 1; /* Stay visible */
-    transform: translateX(0); /* Stay in original position */
-  }
   80% {
-    opacity: 1; /* Keep text visible for 2-3 seconds */
+    opacity: 1; /* Keep text visible for a while */
     transform: translateX(0); /* Stay in original position */
   }
   90% {
@@ -178,17 +174,21 @@ body {
     opacity: 1; /* Fully visible */
     transform: translateX(0); /* Start at original position */
   }
-  20% {
+  30% {
     opacity: 1; /* Stay fully visible */
     transform: translateX(0);
   }
-  80% {
-    opacity: 1; /* Fade out completely */
-    transform: translateX(-100%); /* Slide out to the left */
+  40% {
+    opacity: 1; /* Remain white while fading out */
+    transform: translateX(0);
+  }
+  60% {
+    opacity: 1; /* Fully hidden */
+    transform: translateX(100%); /* Slide out to the right */
   }
   100% {
-    opacity: 1; /* Keep it opaque after sliding out */
-    transform: translateX(-100%);
+    opacity: 1; /* Ensure fully hidden */
+    transform: translateX(100%); /* Keep it out of view */
   }
 }
 
@@ -197,7 +197,7 @@ body {
   display: inline-block;
   color: white; /* Change text color to white */
   overflow: hidden; /* Prevent overflow */
-  animation: revealText 5s ease-in-out infinite; /* Looping text animation */
+  animation: revealText 7s ease-in-out infinite; /* Adjust duration to allow for text to stay visible */
 }
 
 .text-reveal::before {
@@ -207,9 +207,9 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgb(255, 255, 255);
+  background-color: rgb(255, 255, 255); /* White background */
   z-index: 10;
-  animation: whiteBackground 5s ease-in-out infinite; /* Looping background animation */
+  animation: whiteBackground 7s ease-in-out infinite; /* Looping background animation */
 }
 
 .fade-in-out {
@@ -217,7 +217,7 @@ body {
   z-index: 20; /* Ensure text is above the background */
 }
 
-  
+
 
 .image-slider {
   position: relative;
@@ -227,3 +227,154 @@ body {
 .image-slider img {
   transition: opacity 1s ease-in-out;
 }
+/* Sidebar Button Styling */
+.dashboard {
+  display: flex;
+  flex-direction: row;
+  height: auto; /* Full height for the dashboard */
+}
+
+.sidebar {
+  width: 250px;
+  background: #2c3e50;
+  color: white;
+  transition: transform 0.3s ease;
+  transform: translateX(-100%);
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 20px ; 
+
+  
+  /* Full height for sidebar */
+}
+
+
+
+.sidebar li:hover {
+  background-color: #34495e;
+  
+}
+.sidebar li {
+  padding: 10px 30px; /* Padding for the options */
+  margin: 5px 0; /* Adds vertical gap between options */
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s;
+}
+
+.sidebar .active {
+  background-color: #2980b9;
+}
+
+
+.sidebar.active {
+  transform: translateX(0);
+}
+
+.main-content {
+  flex: 1;
+  padding: 20px;
+  background-color: ghostwhite; /* Light background for main content */
+  transition: margin-left 0.3s ease;
+}
+
+.hamburger {
+  background: #2c3e50; /* Match sidebar color */
+  border: none;
+  color: white; /* Text color for the hamburger icon */
+  cursor: pointer;
+  display: none; /* Hide on desktop */
+  font-size: 30px; /* Size of hamburger icon */
+  padding: 10px; /* Add padding for a bigger clickable area */
+  border-radius: 5px; /* Rounded corners */
+  position: fixed; /* Fixed positioning */
+  bottom: 20px; /* Distance from the bottom of the screen */
+  left: 1px; /* Distance from the left of the screen */
+  z-index: 3; /* Above sidebar */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
+}
+
+/* Media Queries */
+/* @media (max-width: 768px) {
+  .hamburger {
+    display: block; /* Show on mobile */
+
+.hamburger {
+  display: block; /* Show on mobile */
+}
+
+  .sidebar {
+    position: fixed;
+    height: 100%;
+    width: 250px; /* Fixed width */
+    overflow-y: auto; /* Scroll if content overflows */
+  }
+
+  .main-content {
+    margin-left: 0; /* No left margin for main content on mobile */
+  }
+
+  .sidebar.active + .main-content {
+    margin-left: 250px; /* Shift main content when sidebar is active */
+  }
+
+
+  .order-card {
+    background-color: white; /* Card background */
+    border: 1px solid #ddd; /* Card border */
+    border-radius: 8px; /* Rounded corners for cards */
+    padding: 15px; /* Inner padding for card */
+    margin-bottom: 15px; /* Space between cards */
+    transition: box-shadow 0.3s; /* Transition for hover effect */
+  }
+  .invoice-card {
+    background-color: white; /* Card background */
+    border: 1px solid #ddd; /* Card border */
+    border-radius: 8px; /* Rounded corners for cards */
+    padding: 15px; /* Inner padding for card */
+    margin-bottom: 15px; /* Space between cards */
+    transition: box-shadow 0.3s; /* Transition for hover effect */
+  }
+
+  .download-button {
+    display: flex;
+    background-color: #4CAF50; /* Green background */
+    color: white; /* White text */
+    padding: 10px 20px; /* Top and bottom padding, left and right padding */
+    border: none; /* No border */
+    border-radius: 5px; /* Rounded corners */
+    cursor: pointer;
+     /* Pointer cursor on hover */
+    font-size: 16px; /* Larger font size */
+    transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effect */
+  }
+  
+  .download-button:hover {
+    background-color: #45a049; /* Darker green on hover */
+    transform: scale(1.05); /* Slightly enlarge on hover */
+  }
+  
+  .download-button:focus {
+    outline: none; /* Remove outline on focus */
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  th, td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+  }
+  
+  th {
+    background-color: #f4f4f4;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #f9f9f9;
+  }
+  

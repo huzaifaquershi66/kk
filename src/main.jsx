@@ -14,7 +14,7 @@ import Contact from './components/contact';
 import TermsAndConditions from './components/Terms';
 import Privacy from './components/Privacy';
 
-import store from './components/store/store';
+
 import Login from './components/Login';
 import Signup from './components/Signup';
 import Client from './components/Clientpanel';
@@ -96,9 +96,9 @@ const Main = () => {
 // Render the application
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <Provider store={store}>
+
   
-      <Main /> {/* Main component */}
+      <Main /> 
    
-  </Provider>
+
 );

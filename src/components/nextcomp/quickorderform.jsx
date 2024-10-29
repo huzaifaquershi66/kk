@@ -1,30 +1,39 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { addOrder } from '../store/vectorSlice';
+import { addVector } from '../store/vectorslice';
+import { db } from '../../../firebase'; // Import your Firebase configuration
+import { collection, addDoc } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth' // Import Firestore functions
 
 const QuickOrderForm = () => {
   const dispatch = useDispatch();
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const auth = getAuth(); // Get the Firebase Auth instance
+  const user = auth.currentUser; // Get the currently signed-in user
+
+  const isAuthenticated = !!user;
   const navigate = useNavigate();
 
   const [formData, setFormDataState] = useState(() => {
     const savedData = localStorage.getItem('quickOrderForm');
-    return savedData ? JSON.parse(savedData) : {
-      designName: '',
-      customerName: '',
-      customerEmail: '',
-      phone: '',
-      format: 'Corel Draw', // Default format
-      location: '',
-      file: null,
-      fileUrl: null,
-      height: '',
-      width: '',
-      colorName: '',
-      expectedDelivery: '',
-      comments: '',
-    };
+    return savedData
+      ? JSON.parse(savedData)
+      : {
+          designName: '',
+          customerName: '',
+           companyname: '',
+          customerEmail: '',
+          phone: '',
+          format: 'Corel Draw',
+          location: '',
+          file: null,
+          fileUrl: null,
+          height: '',
+          width: '',
+          colorName: '',
+          expectedDelivery: '',
+          comments: '',
+        };
   });
 
   useEffect(() => {
@@ -32,23 +41,23 @@ const QuickOrderForm = () => {
   }, [formData]);
 
   const locationOptions = [
-    { value: "One Color Vector", price: 8 },
-    { value: "Two Color Vector", price: 13 },
-    { value: "Three Color Vector", price: 18 },
-    { value: "Four Color Vector", price: 23 },
-    { value: "Five Color Vector", price: 28 },
-    { value: "Six Color Vector", price: 33 },
+    { value: 'One Color Vector', price: 8 },
+    { value: 'Two Color Vector', price: 13 },
+    { value: 'Three Color Vector', price: 18 },
+    { value: 'Four Color Vector', price: 23 },
+    { value: 'Five Color Vector', price: 28 },
+    { value: 'Six Color Vector', price: 33 },
   ];
 
   const formatOptions = [
-    { value: "Corel Draw" },
-    { value: "Adobe Illustrator" },
-    { value: "EPS Format" },
-    { value: "WMF Format" },
-    { value: "JPG Format" },
-    { value: "BMP Format" },
-    { value: "PDF Format" },
-    { value: "Others" },
+    { value: 'Corel Draw' },
+    { value: 'Adobe Illustrator' },
+    { value: 'EPS Format' },
+    { value: 'WMF Format' },
+    { value: 'JPG Format' },
+    { value: 'BMP Format' },
+    { value: 'PDF Format' },
+    { value: 'Others' },
   ];
 
   const handleChange = (e) => {
@@ -67,10 +76,13 @@ const QuickOrderForm = () => {
       formData.append('upload_preset', 'marketing');
 
       try {
-        const response = await fetch(`https://api.cloudinary.com/v1_1/dgb4spjyk/upload`, {
-          method: 'POST',
-          body: formData,
-        });
+        const response = await fetch(
+          `https://api.cloudinary.com/v1_1/dgb4spjyk/upload`,
+          {
+            method: 'POST',
+            body: formData,
+          }
+        );
         const data = await response.json();
         setFormDataState((prevData) => ({
           ...prevData,
@@ -83,7 +95,7 @@ const QuickOrderForm = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isAuthenticated) {
@@ -91,19 +103,23 @@ const QuickOrderForm = () => {
       return;
     }
 
-    const uniqueId = Date.now();
+    const uniqueId = `${Date.now()}-${Math.floor(Math.random() * 1000)}`;
     const selectedLocation = formData.location
-      ? locationOptions.find(option => option.value === formData.location)
-      : locationOptions[0]; // Default to first location
+      ? locationOptions.find((option) => option.value === formData.location)
+      : locationOptions[0];
 
     const price = selectedLocation ? selectedLocation.price : 0;
     const formatToSubmit = formData.format || 'Corel Draw';
 
     const newOrder = {
+      uid: user.uid,
       id: uniqueId,
+
+     
       designName: formData.designName,
       customerName: formData.customerName,
       customerEmail: formData.customerEmail,
+      companyname:formData.companyname,
       phone: formData.phone,
       format: formatToSubmit,
       location: selectedLocation.value,
@@ -113,11 +129,23 @@ const QuickOrderForm = () => {
       colorName: formData.colorName,
       fileUrl: formData.fileUrl,
       expectedDelivery: formData.expectedDelivery,
+      status: "Pending",
       comments: formData.comments,
+      createdAt: new Date(),
     };
 
-    dispatch(addOrder(newOrder));
+    // Dispatch the order to Redux store
+    dispatch(addVector(newOrder));
 
+    // Save the order to Firestore
+    try {
+      const docRef = await addDoc(collection(db, 'vectors'), newOrder);
+      console.log('Document written with ID: ', docRef.id);
+    } catch (e) {
+      console.error('Error adding document: ', e);
+    }
+
+    // Proceed to payment or any further action
     const form = new FormData();
     form.append('sid', '1694715');
     form.append('mode', '2CO');
@@ -127,8 +155,8 @@ const QuickOrderForm = () => {
     form.append('li_0_recurrence', 'No');
 
     const hiddenForm = document.createElement('form');
-    hiddenForm.action = "https://www.2checkout.com/checkout/spurchase"; 
-    hiddenForm.method = "post";
+    hiddenForm.action = 'https://www.2checkout.com/checkout/spurchase';
+    hiddenForm.method = 'post';
 
     for (const [key, value] of form.entries()) {
       const input = document.createElement('input');
@@ -141,191 +169,230 @@ const QuickOrderForm = () => {
     document.body.appendChild(hiddenForm);
     hiddenForm.submit();
   };
-
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
-      <div className="w-full bg-white p-10 shadow-lg rounded-2xl">
-        <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
-          Quick Vector Form
-        </h2>
+    <div className="w-full bg-white p-10 shadow-lg rounded-2xl">
+      <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
+        Quick Vector Form
+      </h2>
 
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div>
-              <label className="block font-raleway font-semibold text-gray-800 mb-1">
-                Design Name *
-              </label>
+      <form onSubmit={handleSubmit}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div>
+            <label htmlFor="designName" className="block font-raleway font-semibold text-gray-800 mb-1">
+              Design Name *
+            </label>
+            <input
+              type="text"
+              name="designName"
+              id="designName"
+              className="w-full p-4 border border-gray-300 rounded-lg"
+              value={formData.designName}
+              onChange={handleChange}
+              placeholder="Enter Design Name"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="customerName" className="block font-semibold font-raleway text-gray-800 mb-1">
+              Customer Name *
+            </label>
+            <input
+              type="text"
+              name="customerName"
+              id="customerName"
+              className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+              value={formData.customerName}
+              onChange={handleChange}
+              placeholder="Enter Customer Name"
+              required
+            />
+          </div>
+          <div>
+            <label htmlFor="customerName" className="block font-semibold font-raleway text-gray-800 mb-1">
+              Company Name *
+            </label>
+            <input
+              type="text"
+              name="companyname"
+              id="companyname"
+              className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+              value={formData.companyname}
+              onChange={handleChange}
+              placeholder="Enter Company name"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="phone" className="block font-semibold font-raleway text-gray-800 mb-1">
+              Phone Number *
+            </label>
+            <input
+              type="text"
+              name="phone"
+              id="phone"
+              className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Enter Phone Number"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="customerEmail" className="block font-semibold font-raleway text-gray-800 mb-1">
+              Customer Email *
+            </label>
+            <input
+              type="email"
+              name="customerEmail"
+              id="customerEmail"
+              className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
+              value={formData.customerEmail}
+              onChange={handleChange}
+              placeholder="Enter Customer Email"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="format" className="block font-semibold font-raleway text-gray-800 mb-1">
+              Select Format *
+            </label>
+            <select
+              name="format"
+              id="format"
+              className="w-full p-4 border font-raleway border-gray-300 rounded-lg"
+              value={formData.format}
+              onChange={handleChange}
+              required
+            >
+              {formatOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.value}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="numberOfColors" className="block font-semibold font-raleway text-gray-800 mb-1">
+              No. of Colors *
+            </label>
+            <select
+              name="numberOfColors"
+              id="numberOfColors"
+              className="w-full p-4 border border-gray-300 rounded-lg"
+              value={formData.numberOfColors}
+              onChange={handleChange}
+              required
+            >
+              {locationOptions.map(option => (
+                <option key={option.value} value={option.value}>
+                  {option.value} Price ${option.price}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label htmlFor="file" className="block font-semibold font-raleway text-gray-800 mb-1">
+              Upload Design File
+            </label>
+            <input
+              type="file"
+              name="file"
+              id="file"
+              className="w-full p-4 border border-gray-300 rounded-lg"
+              onChange={handleFileChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block font-raleway font-semibold text-gray-800 mb-1">
+              Size in Inches
+            </label>
+            <div className="flex space-x-4 mb-5">
               <input
-                type="text"
-                name="designName"
+                type="number"
+                name="height"
                 className="w-full p-4 border border-gray-300 rounded-lg"
-                value={formData.designName}
+                value={formData.height}
                 onChange={handleChange}
-                placeholder="Enter Design Name"
+                placeholder="Height"
                 required
               />
-            </div>
-
-            {!isAuthenticated && (
-              <>
-                <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                  Customer Name *
-                </label>
-                <input
-                  type="text"
-                  name="customerName"
-                  className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
-                  value={formData.customerName}
-                  onChange={handleChange}
-                  placeholder="Enter Customer Name"
-                  required
-                />
-
-                <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                  Customer Email *
-                </label>
-                <input
-                  type="email"
-                  name="customerEmail"
-                  className="w-full p-4 border border-gray-300 rounded-lg mb-5 focus:ring-2 focus:ring-purple-600"
-                  value={formData.customerEmail}
-                  onChange={handleChange}
-                  placeholder="Enter Customer Email"
-                  required
-                />
-              </>
-            )}
-
-            <div>
-              <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                Select Format *
-              </label>
-              <select
-                name="format"
-                className="w-full p-4 border font-raleway border-gray-300 rounded-lg"
-                value={formData.format}
-                onChange={handleChange}
-                required
-              >
-                {formatOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.value}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                No.of Colors
-              </label>
-              <select
-                name="location"
-                className="w-full p-4 border border-gray-300 rounded-lg"
-                value={formData.location}
-                onChange={handleChange}
-                required
-              >
-                {locationOptions.map(option => (
-                  <option key={option.value} value={option.value}>
-                    {option.value} Price ${option.price}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            <div>
-              <label className="block font-semibold font-raleway text-gray-800 mb-1">
-                Upload Design File
-              </label>
               <input
-                type="file"
-                name="file"
+                type="number"
+                name="width"
                 className="w-full p-4 border border-gray-300 rounded-lg"
-                onChange={handleFileChange}
+                value={formData.width}
+                onChange={handleChange}
+                placeholder="Width"
                 required
               />
-            </div>
-
-            <div>
-              <label className="block font-raleway font-semibold text-gray-800 mb-1">
-                Size in Inches
-              </label>
-              <div className="flex space-x-4 mb-5">
-                <input
-                  type="number"
-                  name="height"
-                  className="w-full p-4 border border-gray-300 rounded-lg"
-                  value={formData.height}
-                  onChange={handleChange}
-                  placeholder="Height"
-                  required
-                />
-                <input
-                  type="number"
-                  name="width"
-                  className="w-full p-4 border border-gray-300 rounded-lg"
-                  value={formData.width}
-                  onChange={handleChange}
-                  placeholder="Width"
-                  required
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block font-raleway font-semibold text-gray-800 mb-1">
-                Name of Color *
-              </label>
-              <input
-                type="text"
-                name="colorName"
-                className="w-full p-4 border border-gray-300 rounded-lg"
-                value={formData.colorName}
-                onChange={handleChange}
-                placeholder="Enter Color Name"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block font-raleway font-semibold text-gray-800 mb-1">
-                Expected Delivery *
-              </label>
-              <input
-                type="date"
-                name="expectedDelivery"
-                className="w-full p-4 border border-gray-300 rounded-lg"
-                value={formData.expectedDelivery}
-                onChange={handleChange}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block font-raleway font-semibold text-gray-800 mb-1">
-                Comments
-              </label>
-              <textarea
-                name="comments"
-                className="w-full p-4 border border-gray-300 rounded-lg"
-                value={formData.comments}
-                onChange={handleChange}
-                placeholder="Additional Comments"
-                rows="4"
-              ></textarea>
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="mt-5 bg-blue-600 font-raleway text-white p-3 rounded-lg w-full"
-          >
-            Checkout
-          </button>
-        </form>
-      </div>
+          <div>
+            <label htmlFor="colorName" className="block font-raleway font-semibold text-gray-800 mb-1">
+              Name of Color *
+            </label>
+            <input
+              type="text"
+              name="colorName"
+              id="colorName"
+              className="w-full p-4 border border-gray-300 rounded-lg"
+              value={formData.colorName}
+              onChange={handleChange}
+              placeholder="Enter Color Name"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="expectedDelivery" className="block font-raleway font-semibold text-gray-800 mb-1">
+              Expected Delivery *
+            </label>
+            <input
+              type="date"
+              name="expectedDelivery"
+              id="expectedDelivery"
+              className="w-full p-4 border border-gray-300 rounded-lg"
+              value={formData.expectedDelivery}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="comments" className="block font-raleway font-semibold text-gray-800 mb-1">
+              Comments
+            </label>
+            <textarea
+              name="comments"
+              id="comments"
+              className="w-full p-4 border border-gray-300 rounded-lg"
+              value={formData.comments}
+              onChange={handleChange}
+              placeholder="Additional Comments"
+              rows="4"
+            ></textarea>
+          </div>
+        </div>
+
+        <button
+          type="submit"
+          className="mt-5 bg-blue-600 font-raleway text-white p-3 rounded-lg w-full"
+        >
+          Checkout
+        </button>
+      </form>
     </div>
+  </div>
   );
 };
 

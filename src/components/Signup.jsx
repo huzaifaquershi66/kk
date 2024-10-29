@@ -1,5 +1,9 @@
+// src/Signup.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { auth,db } from '../../firebase'; // Import your firebase configuration
+import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { setDoc,doc, } from 'firebase/firestore';
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -16,22 +20,33 @@ const Signup = () => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
-
-  const handleSubmit = (e) => {
+  // Import Firestore methods
+  
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Retrieve existing users from local storage
-    const existingUsers = JSON.parse(localStorage.getItem('users')) || [];
-    
-    // Add the new user to the existing users array
-    existingUsers.push(formData);
-    
-    // Save the updated users array back to local storage
-    localStorage.setItem('users', JSON.stringify(existingUsers));
-
-    alert('Signup successful!');
-    navigate('/login');
+  
+    try {
+      // Create user with email and password using Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+  
+      // Create a user document in Firestore
+      await setDoc(doc(db, 'users', user.uid), {
+        fullName: formData.fullName,
+        email: formData.email,
+        username: formData.username,
+        phone: formData.phone,
+        company: formData.company,
+        uid: user.uid // Store the user's UID
+      });
+  
+      alert('Signup successful!');
+      navigate('/login'); // Redirect to login after successful signup
+    } catch (error) {
+      alert(error.message); // Show error if signup fails
+    }
   };
+  
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600">

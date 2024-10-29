@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useLocation, Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { getAuth } from 'firebase/auth'
 
 const Header = () => {
   const [toggleform, settoggleform] = useState(false);
   const location = useLocation(); // To get the current route
-  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const auth = getAuth(); // Get the Firebase Auth instance
+  const user = auth.currentUser; // Get the currently signed-in user
+
+  const isAuthenticated = !!user;
 
   const handletoggleform = () => {
     console.log("Toggling form", toggleform);

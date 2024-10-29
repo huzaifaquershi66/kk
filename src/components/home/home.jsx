@@ -3,6 +3,11 @@ import QuickOrderForm from '../nextcomp/quickorderform';
 import Services from "../nextcomp/services"
 import Reviews from '../nextcomp/reviews';
 import { Link } from 'react-router-dom';
+import shirt from "../../assets/ani.png"
+import vector from "../../assets/dj.png"
+import jacketjss from "../../assets/jacketjss.png"
+import ss from "../../assets/ss.png"
+import mao from "../../assets/mao.png"
 
 const images = [
   'https://cdn.pixabay.com/photo/2016/08/12/00/38/title-1587327_1280.jpg',
@@ -13,6 +18,28 @@ const images = [
 const Home = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [overlayIndex, setOverlayIndex] = useState(0);
+
+  const overlayImages = [
+    shirt,
+    vector,
+    mao,
+  ];
+  
+  
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIsAnimating(true);
+
+      setTimeout(() => {
+        setOverlayIndex((prevIndex) => (prevIndex + 1) % overlayImages.length);
+        setIsAnimating(false);
+      },700 ); // Transition duration for the slide-in effect
+    }, 7000); // Change overlay image every 3 seconds
+
+    return () => clearInterval(interval);
+  }, [overlayImages.length]);
 
   const animationDuration =5000; // 3 seconds for both image and text
 
@@ -30,8 +57,8 @@ const Home = () => {
       // Hide white background after the image has changed
       setTimeout(() => {
         // setIsAnimating(false); // Hide white background
-      }, 4000); // 3 seconds for white background + 1 second delay
-    }, 3000); // Change image every 8 seconds
+      }, 7000); // 3 seconds for white background + 1 second delay
+    }, 7000); // Change image every 8 seconds
 
     return () => clearInterval(interval);
   }, [images.length]); // Ensure it works with the number of images
@@ -39,23 +66,36 @@ const Home = () => {
   return (
     <>
     <div className="bg-gray-50">
-    <div className='h-[470px] w-full overflow-hidden relative m-0 p-0'>
+    <div className='h-[520px] w-full overflow-hidden relative m-0 p-0 bg-transparent'>
       {/* Image Slider */}
       <img
-        className={`h-full w-full object-cover transition-opacity duration-[1000ms] ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
-        src={images[currentIndex]}
+        className={`h-full w-full object-cover bg-transparent transition-opacity duration-[1000ms] ${isAnimating ? 'opacity-0' : 'opacity-100'}`}
+        src={"https://cdn.pixabay.com/photo/2016/08/12/00/38/title-1587327_1280.jpg"}
         alt='Slider Image'
       />
+ <div className="absolute top-6 right-4">
+        <img
+          src={overlayImages[overlayIndex]}
+          alt="Overlay"
+          className={`md:h-[450px] h-[300px] w-[300px] md:w-[500px] object-contain transition-transform duration-1000 ${
+            isAnimating ? 'translate-x-full opacity-0' : 'translate-x-0 opacity-100'
+          }`}
+          style={{
+            transition: 'transform 1s ease-in-out, opacity 1s ease-in-out',
+            background: 'none',
+          }}
+        />
+      </div>
 
       {/* White Background Overlay */}
       <div className={`absolute inset-0 ${isAnimating ? 'opacity-100 transition-opacity duration-2000' : 'opacity-0'} rounded-lg z-10`}></div>
 
       {/* Taglines and Buttons */}
-      <div className={`absolute inset-0 flex flex-col items-center justify-center text-center`}>
-        <h2 className={`text-reveal fade-in-out font-poppins text-[35px] sm:text-[50px] md:text-[60px] lg:text-[75px] xl:text-[90px] font-extrabold px-6`}>
+      <div className={`absolute z-50 inset-0 flex flex-col items-center justify-center text-center`}>
+        <h2 className={`text-reveal fade-in-out font-poppins text-[25px] sm:text-[40px] md:text-[50px] lg:text-[65px] xl:text-[80px] font-extrabold px-6`}>
           Best Prices, 
         </h2>
-        <h2 className={`text-reveal fade-in-out my-4 font-poppins text-[35px] sm:text-[50px] md:text-[60px] lg:text-[75px] xl:text-[90px] font-extrabold px-6`}>
+        <h2 className={`text-reveal fade-in-out my-4 font-poppins text-[25px] sm:text-[40px] md:text-[50px] lg:text-[65px] xl:text-[80px] font-extrabold px-6`}>
          Fast Turnaround
         </h2>
         <h3 className={`text-reveal fade-in-out font-sans text-[16px] sm:text-[18px] md:text-[20px] lg:text-[22px] xl:text-[24px] font-semibold px-4 mt-4`}>
@@ -98,9 +138,9 @@ const Home = () => {
 </div> */}
 
 {/* Digitizing Service Section */}
-<div className="bg-gray-100 text-gray-800 p-8 rounded-lg shadow-md ">
-<div className="bg-blue-200 text-gray-800 md:h-36 h-20 p-4 md:p-8 rounded-lg shadow-lg my-10 transition-transform duration-300 hover:scale-105 hover:shadow-xl ">
-  <h2 className="md:text-[60px] font-manrope text-[30px] whitespace-nowrap font-bold text-center mb-6 text-gray-800 opacity-0 animate-fade-in delay-200">
+<div className="bg-gray-100  text-gray-800 p-8 rounded-lg shadow-md ">
+<div className="bg-blue-200 cursor-pointer hover:bg-blue-400  text-gray-800 md:h-36 h-20 p-4 md:p-8 rounded-lg shadow-lg my-10 transition-transform duration-300 hover:scale-105 hover:shadow-xl ">
+  <h2 className="md:text-[60px]  font-manrope text-[30px] whitespace-nowrap font-bold text-center mb-6 text-gray-800 opacity-0 animate-fade-in delay-200">
     Digitizing Service
   </h2>
 </div>
@@ -109,29 +149,29 @@ const Home = () => {
 
   {/* Service Boxes */}
 {/* Service Boxes */}
-<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div className="grid grid-cols-1 md:grid-cols-3 cursor-pointer gap-6">
   {/* Box 1 */}
-  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl animate-pulse">
+  <div className="bg-gradient-to-r  from-[#E0F7FA] to-[#FFEBEE]  p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl ">
     <h4 className="text-xl font-helveticaLight font-semibold mb-2">💲 $8 Flat Rate</h4>
     <p className='font-poppins font-semibold'>for Left chest size 5x5 inches (Unlimited Stitches One File)</p>
     <p className='font-poppins font-semibold'>(ie: for Cap, Cap back, Sleeves)</p>
   </div>
 
   {/* Box 2 */}
-  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl animate-pulse">
+  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl ">
     <h4 className="text-xl font-semibold mb-2 font-helveticaLight">💲 $35 Flat Rate</h4>
     <p className='font-poppins font-semibold'>for Jacket Back logos (Unlimited Stitches One File)</p>
   </div>
 
   {/* Box 3 */}
-  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl animate-pulse">
+  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl ">
     <h4 className="text-xl font-semibold mb-2 font-helveticaLight">🚀 Fast Turnaround</h4>
     <p className='font-poppins font-semibold'>8 - 24 hours fast turnaround time</p>
   </div>
 </div>
 
 {/* Additional Information in a Single Box */}
-<div className="mt-8 bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg border-l-4 border-indigo-500 animate-pulse">
+<div className="mt-8 cursor-pointer transition-transform duration-300 hover:scale-105 bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg border-l-4 border-indigo-500 ">
   <h4 className="text-xl font-semibold mb-2 font-helveticaLight">Additional Information</h4>
   <ul className="list-disc list-inside font-poppins font-semibold">
     <li>Digitized by well trained people</li>
@@ -146,7 +186,7 @@ const Home = () => {
 
 {/* Vector Artwork Service Section */}
 <div className="bg-gray-200 text-gray-800 p-8 rounded-lg shadow-md ">
-<div className="bg-blue-200 text-gray-800 md:h-36 h-20 p-4 md:p-8 rounded-lg shadow-lg my-10 transition-transform duration-300 hover:scale-105 hover:shadow-xl  ">
+<div className="bg-blue-200 cursor-pointer hover:bg-blue-400 text-gray-800 md:h-36 h-20 p-4 md:p-8 rounded-lg shadow-lg my-10 transition-transform duration-300 hover:scale-105 hover:shadow-xl  ">
   <h2 className="md:text-[60px] font-manrope text-[22px] whitespace-nowrap font-bold  text-center mb-6 text-gray-800 opacity-0 animate-fade-in delay-200">
     Vector Artwork Service
   </h2>
@@ -155,13 +195,13 @@ const Home = () => {
   {/* Vector Artwork Service Boxes */}
   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
   {/* Box 1 */}
-  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl animate-pulse">
+  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] cursor-pointer p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl ">
     <h4 className="text-xl font-semibold mb-2 font-helveticaLight">💲 $25 Flat Rate</h4>
     <p className='font-poppins font-semibold'>For simple designs with 1-3 colors</p>
   </div>
 
   {/* Box 2 */}
-  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl animate-pulse">
+  <div className="bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] cursor-pointer p-6 rounded-lg shadow-lg transition-transform duration-300 hover:scale-105 border-l-4 border-indigo-500 hover:shadow-2xl ">
     <h4 className="text-xl font-semibold mb-2 font-helveticaLight">💲 $40 Flat Rate</h4>
     <p className='font-poppins font-semibold'>For complex designs with 4+ colors</p>
   </div>
@@ -169,7 +209,7 @@ const Home = () => {
 
 
   {/* Additional Information in a Single Box */}
-  <div className="mt-8 bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] p-6 rounded-lg shadow-lg border-l-4 border-indigo-500 animate-pulse">
+  <div className="mt-8 bg-gradient-to-r from-[#E0F7FA] to-[#FFEBEE] cursor-pointer p-6 transition-transform duration-300 hover:scale-105 rounded-lg shadow-lg border-l-4 border-indigo-500 ">
     <h4 className="text-xl font-semibold mb-2 font-helveticaLight">Additional Information</h4>
     <ul className="list-disc list-inside font-poppins font-semibold">
         <li>Fast turnaround for vectorization</li>
