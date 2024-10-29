@@ -252,6 +252,7 @@ body {
 
 
 
+
 .sidebar li:hover {
   background-color: #34495e;
   
@@ -379,3 +380,43 @@ body {
     background-color: #f9f9f9;
   }
   
+
+/* Slide-Down Background Change Effect */
+/* Slide-Down Background Change Effect */
+/* Slide-Down Background Change Effect */
+/* Slide-Down Background Change Effect on Hover */
+/* Slide-Down Background Change Effect on Hover */
+/* Slide-Down Background Change Effect on Hover */
+/* Slide-Down Background Change Effect on Hover */
+/* Slide-Down Background Change Effect on Hover */
+/* Slide-Down Background Change Effect on Hover */
+.click-effect {
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+  transition: transform 0.5s ease;
+}
+
+.click-effect::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 77, 77, 0.7); /* Dark Teal overlay color */
+  transition: top 0.5s ease;
+  z-index: -1;
+}
+
+.click-effect:hover::after {
+  top: 0;
+}
+
+/* Change text color on hover */
+.click-effect:hover h4,
+.click-effect:hover p,
+.click-effect:hover ul,
+.click-effect:hover li {
+  color: white; /* Change text color to white on hover */
+}
