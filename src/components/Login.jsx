@@ -22,7 +22,7 @@ const Login = () => {
       // Sign in user with email and password
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       alert('Login successful!');
-      navigate('/order'); // Redirect to dashboard or admin panel
+      navigate('/clientpanel'); // Redirect to dashboard or admin panel
     } catch (error) {
       alert(error.message); // Show error if login fails
     }
