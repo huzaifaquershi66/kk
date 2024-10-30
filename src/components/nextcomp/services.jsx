@@ -67,12 +67,12 @@ const Services = () => {
               {/* Overlay shadow effect */}
               <div className={`absolute inset-0 transition-opacity duration-300 ${hoveredIndex === index ? 'bg-black opacity-20' : 'opacity-0'}`}></div>
             </div>
-            <div className={`p-6 transition-transform duration-300 transform ${hoveredIndex === index ? 'translate-y-0 bg-gradient-to-b from-blue-300 to-blue-500' : 'translate-y-2 bg-white'}`}>
-              <h3 className={`text-2xl font-semibold transition-colors duration-300 flex items-center ${hoveredIndex === index ? 'text-white' : 'text-gray-800'}`}>
+            <div className={`p-6 transition-transform hover:translate-y-0 hover:bg-gradient-to-b from-blue-300 to-blue-500' : 'translate-y-2 hover:bg-white duration-300 transform ${hoveredIndex === index ? 'translate-y-0 bg-gradient-to-b from-blue-300 to-blue-500' : 'translate-y-2 bg-white'}`}>
+              <h3 className={`text-2xl font-semibold transition-colors  duration-300 flex items-center ${hoveredIndex === index ? 'text-white' : 'text-gray-800'}`}>
                 <span className="mr-2 text-3xl">{service.icon}</span>
                 {service.title}
               </h3>
-              <p className={`mt-2 text-sm transition-colors duration-300 ${hoveredIndex === index ? 'text-white' : 'text-gray-600'}`}>{service.description}</p>
+              <p className={`mt-2 text-sm transition-colors  duration-300 ${hoveredIndex === index ? 'text-white' : 'text-gray-600'}`}>{service.description}</p>
               <p className={`mt-4 text-lg font-bold transition-colors duration-300 ${hoveredIndex === index ? 'text-white' : 'text-gray-800'}`}>{service.price}</p>
               <button className="mt-4 px-4 py-2 bg-blue-500 text-white font-semibold rounded hover:bg-blue-600 transition-colors duration-300">
                 More Details

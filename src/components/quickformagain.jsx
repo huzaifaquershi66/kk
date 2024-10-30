@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { db,auth } from '../../../firebase';
+import { db,auth } from '../../firebase';
 import { getAuth } from 'firebase/auth'
 import { addDoc, collection } from 'firebase/firestore';
 
@@ -180,7 +180,7 @@ const QuickOrderFormagain = () => {
 
   return (
     <div className="flex items-center overflow-x-hidden overflow-y-auto justify-center min-h-screen   ">
-    <div className="w-full bg-white  p-10 shadow-lg rounded-2xl">
+    <div className="w-full bg-white max-h-[96vh]  p-10 shadow-lg rounded-2xl">
       <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
         Quick Order Form
       </h2>

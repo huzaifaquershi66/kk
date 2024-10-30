@@ -228,99 +228,94 @@ body {
   transition: opacity 1s ease-in-out;
 }
 /* Sidebar Button Styling */
+
 .dashboard {
   display: flex;
   flex-direction: row;
-  height: auto; /* Full height for the dashboard */
+  height: 100vh; /* Full height */
+  overflow: hidden;
 }
 
+/* Sidebar Styling */
 .sidebar {
-  width: 250px;
+  width: 250px; /* Default width for larger screens */
   background: #2c3e50;
   color: white;
-  transition: transform 0.3s ease;
-  transform: translateX(-100%);
-  position: relative;
-  z-index: 2;
-  overflow-y: auto; 
+  overflow-y: auto;
   height: 100%;
-  padding: 20px ; 
-
-  
-  /* Full height for sidebar */
+  padding: 20px;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  transition: transform 0.3s ease;
 }
 
-
-
-
-.sidebar li:hover {
-  background-color: #34495e;
-  
-}
 .sidebar li {
-  padding: 10px 30px; /* Padding for the options */
-  margin: 5px 0; /* Adds vertical gap between options */
+  padding: 10px 30px;
+  margin: 5px 0;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s;
+  font-size: 16px; /* Default font size */
+}
+
+.sidebar li:hover {
+  background-color: #34495e;
 }
 
 .sidebar .active {
   background-color: #2980b9;
 }
 
-
-.sidebar.active {
-  transform: translateX(0);
-}
-
+/* Main Content Styling */
 .main-content {
+  margin-left: 250px; /* Default margin for larger screens */
   flex: 1;
   padding: 20px;
-  background-color: ghostwhite; /* Light background for main content */
+  background-color: ghostwhite;
   transition: margin-left 0.3s ease;
+  font-size: 16px; /* Default font size */
 }
 
-.hamburger {
-  background: #2c3e50; /* Match sidebar color */
-  border: none;
-  color: white; /* Text color for the hamburger icon */
-  cursor: pointer;
-  display: none; /* Hide on desktop */
-  font-size: 30px; /* Size of hamburger icon */
-  padding: 10px; /* Add padding for a bigger clickable area */
-  border-radius: 5px; /* Rounded corners */
-  position: fixed; /* Fixed positioning */
-  bottom: 20px; /* Distance from the bottom of the screen */
-  left: 1px; /* Distance from the left of the screen */
-  z-index: 3; /* Above sidebar */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow for depth */
-}
-
-/* Media Queries */
-/* @media (max-width: 768px) {
-  .hamburger {
-    display: block; /* Show on mobile */
-
-.hamburger {
-  display: block; /* Show on mobile */
-}
-
+/* Responsive Styles for Mobile Devices */
+@media (max-width: 768px) {
   .sidebar {
-    position: fixed;
-    height: 100%;
-    width: 250px; /* Fixed width */
-    overflow-y: auto; /* Scroll if content overflows */
+    width: 200px; /* Reduced width for mobile */
   }
 
   .main-content {
-    margin-left: 0; /* No left margin for main content on mobile */
+    margin-left: 200px; /* Adjusted margin for mobile */
   }
 
-  .sidebar.active + .main-content {
-    margin-left: 250px; /* Shift main content when sidebar is active */
+  .sidebar li {
+    padding: 10px 15px; /* Adjust padding for smaller screens */
+    font-size: 14px; /* Smaller font size for mobile */
   }
 
+  .main-content {
+    font-size: 14px; /* Smaller font size for mobile */
+  }
+}
+
+@media (max-width: 576px) {
+  .sidebar {
+    width: 150px; /* Further reduced width for very small screens */
+  }
+
+  .main-content {
+    margin-left: 150px; /* Adjusted margin for very small screens */
+  }
+
+  .sidebar li {
+    padding: 10px 10px; /* Adjust padding for smaller screens */
+    font-size: 12px; /* Further reduced font size for very small screens */
+  }
+
+  .main-content {
+    font-size: 12px; /* Further reduced font size for very small screens */
+  }
+}
 
   .order-card {
     background-color: white; /* Card background */
@@ -348,7 +343,7 @@ body {
     border-radius: 5px; /* Rounded corners */
     cursor: pointer;
      /* Pointer cursor on hover */
-    font-size: 16px; /* Larger font size */
+    font-size: 14px; /* Larger font size */
     transition: background-color 0.3s, transform 0.2s; /* Smooth transition for hover effect */
   }
   
@@ -360,7 +355,7 @@ body {
   .download-button:focus {
     outline: none; /* Remove outline on focus */
   }
-  table {
+  /* table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
@@ -379,7 +374,7 @@ body {
   tr:nth-child(even) {
     background-color: #f9f9f9;
   }
-  
+   */
 
 /* Slide-Down Background Change Effect */
 /* Slide-Down Background Change Effect */
@@ -419,4 +414,119 @@ body {
 .click-effect:hover ul,
 .click-effect:hover li {
   color: white; /* Change text color to white on hover */
+}
+/* Responsive Table Wrapper */
+/* Responsive Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* Table Wrapper */
+/* General Styles for Table */
+/* General Styles for Table */
+/* General Styles for Table */
+/* Responsive Table Container */
+/* General Styles for Table */
+.table-responsive {
+  overflow-x: auto;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 auto;
+}
+
+th, td {
+  border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+tr {
+  transition: background-color 0.3s;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Responsive Styles */
+/* Large screens */
+@media (min-width: 992px) {
+  table {
+    width: 70%; /* Slightly narrower for large screens */
+  }
+  th, td {
+    padding: 10px; /* Compact padding */
+    font-size: 13px;
+  }
+}
+
+/* Medium and Small screens */
+@media (max-width: 992px) {
+  .table-responsive {
+    padding: 0 15px;
+  }
+  table {
+    width: 100%;
+    display: block;
+  }
+  tr {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+  }
+  th, td {
+    padding: 10px;
+    font-size: 14px;
+    display: block;
+    text-align: left;
+  }
+  th {
+    display: none; /* Hide headers on md and sm */
+  }
+  td {
+    border: none;
+    position: relative;
+    padding-left: 20px;
+    font-size: 14px;
+  }
+  td:before {
+    content: attr(data-label); /* Show label for each cell */
+    position: absolute;
+    left: 10px;
+    font-weight: bold;
+    color: #333;
+  }
+}
+
+.table-container {
+  height: 600px; /* Set a max height for the table container */
+  overflow-y: auto;
+ /* Enable vertical scrolling */
+ /* Optional: spacing above the table */
 }

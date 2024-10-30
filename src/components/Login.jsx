@@ -1,12 +1,13 @@
-// src/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { auth } from '../../firebase'; // Import your firebase configuration
 import { signInWithEmailAndPassword } from 'firebase/auth';
 
 const Login = () => {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [error, setError] = useState('');
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+  });
   const navigate = useNavigate();
 
   const handleChange = (e) => {
@@ -18,31 +19,27 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      // Sign in with email and password using Firebase
+      // Sign in user with email and password
       await signInWithEmailAndPassword(auth, formData.email, formData.password);
       alert('Login successful!');
-      navigate('/order'); // Redirect to admin panel
+      navigate('/order'); // Redirect to dashboard or admin panel
     } catch (error) {
-      setError('Invalid email or password. Please try again.'); // Show error message
+      alert(error.message); // Show error if login fails
     }
-  };
-
-  const handleSignupRedirect = () => {
-    navigate('/signup'); // Redirect to signup page
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-purple-600">
-      <form onSubmit={handleSubmit} className="bg-white p-6 rounded shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-4">Login</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
+      <form onSubmit={handleSubmit} className="bg-white shadow-lg rounded-lg p-8 w-96">
+        <h2 className="text-3xl font-bold text-center text-gray-700 mb-6">Login</h2>
+
         <input
           type="email"
           name="email"
           value={formData.email}
           onChange={handleChange}
           placeholder="Email"
-          className="border border-gray-300 p-2 rounded mb-4 w-full"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
@@ -51,20 +48,21 @@ const Login = () => {
           value={formData.password}
           onChange={handleChange}
           placeholder="Password"
-          className="border border-gray-300 p-2 rounded mb-4 w-full"
+          className="border border-gray-300 p-3 rounded mb-4 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
-        <button type="submit" className="bg-blue-500 text-white p-2 rounded w-full mb-4">
+
+        <button type="submit" className="bg-blue-600 text-white p-3 rounded-lg w-full hover:bg-blue-700 transition duration-200">
           Login
         </button>
-        <div className="text-center mt-4">
-          <p>Don’t have an account?</p>
-          <button 
-            type="button" 
-            onClick={handleSignupRedirect} 
-            className="mt-2 text-blue-500 underline"
+
+        <div className="mt-4 text-center">
+          <p className="text-gray-600">Don't have an account?</p>
+          <button
+            onClick={() => navigate('/signup')} // Navigate to signup page
+            className="text-blue-600 hover:underline focus:outline-none"
           >
-            Signup
+            Sign Up
           </button>
         </div>
       </form>
@@ -73,3 +71,4 @@ const Login = () => {
 };
 
 export default Login;
+

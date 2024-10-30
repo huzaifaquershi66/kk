@@ -2,15 +2,23 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useLocation, Link } from 'react-router-dom';
-import { getAuth } from 'firebase/auth'
+import { getAuth ,onAuthStateChanged} from 'firebase/auth'
 
 const Header = () => {
   const [toggleform, settoggleform] = useState(false);
+  const [user, setUser] = useState(null);
   const location = useLocation(); // To get the current route
   const auth = getAuth(); // Get the Firebase Auth instance
-  const user = auth.currentUser; // Get the currently signed-in user
-
-  const isAuthenticated = !!user;
+ 
+ 
+  useEffect(() => {
+    // Listen for auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+      setUser(currentUser); // Update the user state when auth state changes
+    });
+    return () => unsubscribe(); // Cleanup on unmount
+  }, [auth]);
+  const isAuthenticated = !!user; 
 
   const handletoggleform = () => {
     console.log("Toggling form", toggleform);
@@ -54,7 +62,7 @@ const Header = () => {
                 path: isAuthenticated ? "/order" : "/login"
               },
               ...(isAuthenticated ? [{ name: "Vector Now", path: "/vector" }] : []),
-              ...(isAuthenticated ? [{ name: "Client Panel", path: "/client" }] : []),
+              ...(isAuthenticated ? [{ name: "Client Panel", path: "/clientpanel" }] : []),
               { name: "Contact Us", path: "/contact" },
               { name: "Terms and Conditions", path: "/terms" },
               { name: "Privacy Policy", path: "/privacy" }
@@ -132,7 +140,7 @@ const Header = () => {
                   item === "Price" ? "/price" :
                   item === "Order Now" ? "/order" :
                   item === "Vector Now" ? "/vector" :
-                  item === "Client Panel" ? "/client" :
+                  item === "Client Panel" ? "/clientpanel" :
                   item === "Contact Us" ? "/contact" :
                   item === "Terms & Conditions" ? "/terms" :
                   item === "Privacy Policy" ? "/privacy" :

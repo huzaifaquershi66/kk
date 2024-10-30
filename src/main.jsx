@@ -60,10 +60,8 @@ const router = createBrowserRouter([
         path: '/privacy',
         element: <Privacy />,
       },
-      {
-        path: '/client',
-        element: <Client />,
-      },
+    
+   
     ],
   },
  
@@ -75,16 +73,16 @@ const router = createBrowserRouter([
     path: '/signup',
     element: <Signup />,
   },
-  {
-    path: '/clientpanel',
-    element: <Client />,
-  },
+ 
   {
     path: '/adminpanel',
     element: <Admin />,
   },
 
- 
+  {
+    path: '/clientpanel',
+    element: <Client />,
+  },
 ]);
 
 const Main = () => {

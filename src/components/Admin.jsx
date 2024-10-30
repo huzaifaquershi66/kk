@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { db, auth } from '../../firebase';
-import { collection, query, getDocs, updateDoc, doc, where } from 'firebase/firestore';
+import { collection, query, getDocs,getDoc, updateDoc, doc, where } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars } from '@fortawesome/free-solid-svg-icons';
@@ -14,6 +14,9 @@ const AdminPanel = () => {
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('order-records');
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [userDetails, setUserDetails] = useState({});
+    const [userDetailsMap, setUserDetailsMap] = useState({});
     // const [isLoggedIn, setIsLoggedIn] = useState(false);
     // const [username, setUsername] = useState('');
     // const [password, setPassword] = useState('');
@@ -23,25 +26,34 @@ const AdminPanel = () => {
     };
   
     useEffect(() => {
-      const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
-        if (!currentUser) {
-          // setIsLoggedIn(true);
-          // Handle not authenticated state
+      const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
+        if (currentUser) {
+          await fetchAllOrders();
+          await fetchAllVectors();
+          await fetchUserDetails()
+     
+          // Load completed orders and vectors from localStorage
+          const savedCompletedOrders = JSON.parse(localStorage.getItem('completedOrders')) || [];
+          const savedCompletedVectors = JSON.parse(localStorage.getItem('completedVectors')) || [];
+          setCompletedOrders(savedCompletedOrders);
+          setCompletedVectors(savedCompletedVectors);
         }
       });
+  
       return () => unsubscribe();
     }, []);
-    // const handleLogin = (e) => {
-    //   e.preventDefault();
-    //   // Replace with your actual credentials
-    //   if (username === 'huzaifa56567' && password === 'huzaifa123') {
-    //     setIsLoggedIn(true);
-    //     setError('');
-    //   } else {
-    //     setError('Invalid username or password');
-    //   }
-    // };
   
+    const fetchUserDetails = async () => {
+      try {
+        const userCollection = collection(db, 'userDetails');
+        const userSnapshot = await getDocs(userCollection);
+        const userData = userSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        setUserDetails(userData);
+        console.log("Fetched User Details:", userData);
+      } catch (error) {
+        console.error("Error fetching user details:", error);
+      }
+    }
     const fetchAllOrders = async () => {
       try {
         const ordersCollection = collection(db, 'orders');
@@ -75,20 +87,6 @@ const AdminPanel = () => {
         console.error("Error fetching vectors:", error);
       }
     };
- 
-
-  
-    useEffect(() => {
-      fetchAllOrders();
-      fetchAllVectors();
-  
-      // Load completed orders and vectors from localStorage
-      const savedCompletedOrders = JSON.parse(localStorage.getItem('completedOrders')) || [];
-      const savedCompletedVectors = JSON.parse(localStorage.getItem('completedVectors')) || [];
-      setCompletedOrders(savedCompletedOrders);
-      setCompletedVectors(savedCompletedVectors);
-    }, []);
-  
   
     const handleTabClick = (tab) => {
       setActiveTab(tab);
@@ -119,7 +117,12 @@ const AdminPanel = () => {
         return updatedVectors;
       });
     };
-
+    const userDetailsMa = Array.isArray(userDetails)
+    ? userDetails.reduce((map, user) => {
+        map[user.id] = user; // Assuming user ID is stored in Firestore as 'id'
+        return map;
+      }, {})
+    : {}; //
   return (
     <div className="dashboard">
       <aside className={`sidebar ${sidebarOpen ? 'active' : ''}`}>
@@ -153,12 +156,15 @@ const AdminPanel = () => {
                 <h3>All Orders</h3>
                 <ul>
                   {orders.length > 0 ? (
-                    orders.map((order) => (
+                    orders.map((order) => {
+                      const userDetail = userDetailsMa[order.userid] || {}; // Use vector's userId to find details
+                      return (
+
                         <div className="order-card" key={order.id}>
                         <strong>Order ID:</strong> {order.id} <br />
-                        <strong>Email:</strong> {order.customerEmail} <br />
-                        <strong>Full Name:</strong> {order.customerName} <br />
-                        <strong>Company Name:</strong> {order.companyname} <br />
+                        <strong>Email:</strong> {userDetail.email} <br />
+                        <strong>Full Name:</strong> {order.fullName} <br />
+                        <strong>Company Name:</strong> {order.company} <br />
                         <strong>Phone Number:</strong> {order.phone} <br />
                         <strong>Design Name:</strong> {order.designName} <br />
                         <strong>Location:</strong> {order.location} <br />
@@ -175,10 +181,11 @@ const AdminPanel = () => {
                         <strong>Order Status:</strong> {order.status} <br /> 
                         <button  onClick={() => markOrderAsCompleted(order.id)}>Mark as Completed</button>
                       </div>
-                    ))
-                  ) : (
-                    <p>No orders found.</p>
-                  )}
+                   );
+                  })
+                ) : (
+                  <p>No orders found</p> // Message if no vectors
+                )}
                 </ul>
               </>
             )}
@@ -188,14 +195,17 @@ const AdminPanel = () => {
                 <h3>All Vectors</h3>
                 <ul>
                   {vectors.length > 0 ? (
-                    vectors.map((order) => (
+                    vectors.map((order) => {
+                      const userDetail = userDetailsMa[order.userid] || {}; // Use vector's userId to find details
+                      return (
+                    
                       <div className="order-card" key={order.id}>
                         <strong>Vector ID:</strong> {order.id} <br />
-                        <strong>Email:</strong> {order.customerEmail} <br />
-        <strong>Full Name:</strong> {order.customerName} <br />
-        <strong>Company Name:</strong> {order.companyname} <br />
-        <strong>Phone Number:</strong> {order.phone} <br />
-        <strong>Design Name:</strong> {order.designName} <br />
+                        <p><strong>Email:</strong> {order.email}</p>
+                        <strong>Full Name:</strong> {userDetail.fullName} <br />
+        <strong>Company Name:</strong> {userDetail.company} <br />
+        <strong>Phone Number:</strong> {userDetail.phone} <br />
+
      
         <strong>Price:</strong> ${order.rush ? order.price - 5 : order.price} <br /> {/* Show original price if rush */}        <strong>Number Of Colors:</strong> {order.location} <br />
         <strong>Color Name:</strong> {order.colorName} <br />
@@ -207,13 +217,17 @@ const AdminPanel = () => {
         <strong>Comment:</strong> {order.comments} <br />
                         <button onClick={() => markVectorAsCompleted(order.id)}>Mark as Completed</button>
                       </div>
-                    ))
-                  ) : (
-                    <p>No vectors found.</p>
+                                 
+                          
+                              
+                                );
+                              })
+                            ) : (
+                              <p>No vectors found</p> // Message if no vectors
+                            )}
+                          </ul>
+                      </>
                   )}
-                </ul>
-              </>
-            )}
 
             {activeTab === 'completed-orders' && (
               <>

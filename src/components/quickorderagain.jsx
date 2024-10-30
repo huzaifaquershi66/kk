@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 import { useNavigate } from 'react-router-dom';
-import { addVector } from '../store/vectorslice';
-import { db } from '../../../firebase'; // Import your Firebase configuration
+
+import { db } from '../../firebase'; // Import your Firebase configuration
 import { collection, addDoc } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth' // Import Firestore functions
 
@@ -164,8 +164,8 @@ const QuickOrderForm = () => {
     hiddenForm.submit();
   };
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-orange-300 to-orange-500">
-    <div className="w-full bg-white p-10 shadow-lg rounded-2xl">
+    <div className="flex items-center justify-center min-h-screen overflow-y-auto">
+    <div className="w-full max-h-[96vh] bg-white p-10 shadow-lg rounded-2xl">
       <h2 className="text-4xl font-bold mb-6 text-center text-gray-800">
         Quick Vector Form
       </h2>

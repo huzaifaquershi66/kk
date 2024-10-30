@@ -4,9 +4,10 @@ import { db, auth } from '../../firebase'; // Import auth and db from firebase.j
 import { collection, query, where, getDocs,getDoc,doc, vector,updateDoc } from 'firebase/firestore';
 import { onAuthStateChanged } from 'firebase/auth';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons'; // Import FontAwesome icon
-import QuickOrderForm from './nextcomp/quickform';
-import Quickvectorform from "./nextcomp/quickorderform"
+import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { Link } from 'react-router-dom'; // Import FontAwesome icon
+import QuickOrderForm from './nextcomp/../quickformagain';
+import Quickvectorform from "./nextcomp/../quickorderagain"
  // Import QuickOrderForm
 import jsPDF from 'jspdf';
 import { connectDataConnectEmulator } from 'firebase/data-connect';
@@ -21,6 +22,8 @@ const ClientPanel = () => {
    const [userDetails, setUserDetails] = useState({});
    const [rushSelectedOrders, setRushSelectedOrders] = useState({});
    const [rushSelectedVectors, setRushSelectedVectors] = useState({});
+   const [expandedOrder, setExpandedOrder] = useState(null);
+   const [expandedVector, setExpandedVector] = useState(null);
    const [orderFilter, setOrderFilter] = useState('all'); // 'all', 'pending', 'completed'
 const [vectorFilter, setVectorFilter] = useState('all'); // 'all', 'pending', 'completed'
 
@@ -29,23 +32,7 @@ const [vectorFilter, setVectorFilter] = useState('all'); // 'all', 'pending', 'c
 
 // Example call
 // Example call
-const handleRushChange = async (orderId) => {
-  setRushSelectedOrders((prev) => {
-      const newSelectedOrders = {
-          ...prev,
-          [orderId]: !prev[orderId], // Toggle the rush status
-      };
 
-      console.log('Updated rushSelectedOrders:', newSelectedOrders);
-      console.log('Calling updateOrderPrice with orderId:', orderId);
-
-      // Call updateOrderPrice with the new rush status
-      updateOrderPrice(orderId, newSelectedOrders[orderId]);
-      // Save to local storage
-      localStorage.setItem('rushSelectedOrders', JSON.stringify(newSelectedOrders));
-      return newSelectedOrders;
-  });
-};
 
 
 
@@ -53,60 +40,39 @@ const handleRushChange = async (orderId) => {
 
 
   
-    const handleRushChangeVector = async (orderId) => {
-      setRushSelectedVectors((prev) => {
-        const newSelectedVectors = {
-          ...prev,
-          [orderId]: !prev[orderId],
-        };
-        // Save to local storage
-        localStorage.setItem('rushSelectedVectors', JSON.stringify(newSelectedVectors));
-        updateVectorPrice(orderId, newSelectedVectors[orderId]); // Update price in Firestore
-        return newSelectedVectors;
-      });
-    };
-   // ...other useEffects and functions for fetching data
+
    
   // State for sidebar visibility
 
-   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       if (currentUser) {
         setUser(currentUser);
-        fetchUserDetails(currentUser.uid).then(() => {
-          fetchUserOrders(currentUser.uid); // Now fetch orders only after user details are fetched
-        });
+        await fetchUserDetails(currentUser.uid); // Ensure you await the fetch
+        await fetchUserOrders(currentUser.uid); // Fetch orders only after user details are fetched
+        await fetchUservectors(currentUser.uid); // Also fetch vectors
       } else {
         setUser(null);
         setOrders([]); 
-        setvectors([]); // Clear orders if no user
+        setVectors([]); // Clear orders if no user
+        setUserDetails({}); // Clear user details as well
       }
     });
-   
+  
     return () => unsubscribe();
   }, []);
   
-  // useEffect(() => {
-  //   // Load rush selected orders from local storage
-  //   const storedRushOrders = JSON.parse(localStorage.getItem('rushSelectedOrders'));
-  //   if (storedRushOrders) {
-  //     setRushSelectedOrders(storedRushOrders);
-  //   }
 
-  //   // Load rush selected vectors from local storage
-  //   const storedRushVectors = JSON.parse(localStorage.getItem('rushSelectedVectors'));
-  //   if (storedRushVectors) {
-  //     setRushSelectedVectors(storedRushVectors);
-  //   }
-  // }, []);
-  
+
 
 
   const fetchUserDetails = async (userId) => {
     try {
-      const userDoc = await getDoc(doc(db, 'users', userId)); // Fetch user details from Firestore
+      const userDoc = await getDoc(doc(db, 'userDetails', userId)); // Fetch user details from Firestore
       if (userDoc.exists()) {
-        setUserDetails(userDoc.data()); // Set user details
+        const userData = userDoc.data();
+        setUserDetails(userData); // Set user details
+        localStorage.setItem('userDetails', JSON.stringify(userData)); // Store in local storage
       } else {
         console.error("No such user document!");
       }
@@ -114,6 +80,15 @@ const handleRushChange = async (orderId) => {
       console.error("Error fetching user details:", error);
     }
   };
+  
+  // On component mount, check local storage
+  useEffect(() => {
+    const storedUserDetails = localStorage.getItem('userDetails');
+    if (storedUserDetails) {
+      setUserDetails(JSON.parse(storedUserDetails));
+    }
+  }, []);
+  
 
   const fetchUserOrders = async (userId) => {
     try {
@@ -179,23 +154,11 @@ const handleRushChange = async (orderId) => {
   };
    
 
-  useEffect(() => {
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden'; // Scroll ko disable karein
-      document.body.style.position = 'fixed'; // Body ki position ko fixed karein
-    } else {
-      document.body.style.overflow = 'auto'; // Scroll ko enable karein
-      document.body.style.position = 'relative'; // Position ko reset karein
-    }
-    return () => {
-      document.body.style.overflow = 'auto'; // Cleanup
-      document.body.style.position = 'relative'; // Cleanup
-    };
-  }, [sidebarOpen]);
+
  
 
   const generateInvoice = (order) => {
-    const finalPrice = order.price + (rushSelectedOrders ? 5 : 0); // Adjust price if Rush is selected
+   // Adjust price if Rush is selected
     const doc = new jsPDF();
 
     doc.setFontSize(16);
@@ -207,7 +170,7 @@ const handleRushChange = async (orderId) => {
     doc.text(`Email: ${user.email}`, 20, 60);
     doc.text(`Phone Number: ${userDetails.phone}`, 20, 70);
     doc.text(`Design Name: ${order.designName}`, 20, 80);
-    doc.text(`Price: $${finalPrice}`, 20, 90);
+    doc.text(`Price: $${order.price}`, 20, 90);
     doc.text(`Order Date: ${order.createdAt.toDate().toLocaleDateString()}`, 20, 100);
     doc.text(`Number of Colors: ${order.numberOfColors}`, 20, 110);
     doc.text(`Color Name: ${order.colorName}`, 20, 120);
@@ -223,7 +186,7 @@ const handleRushChange = async (orderId) => {
   };
 
   const generateInvoicevector = (order) => {
-    const finalPrice = order.price + (rushSelectedVectors ? 5 : 0); // Adjust price if Rush is selected
+  // Adjust price if Rush is selected
     const doc = new jsPDF();
 
     doc.setFontSize(16);
@@ -235,14 +198,14 @@ const handleRushChange = async (orderId) => {
     doc.text(`Email: ${user.email}`, 20, 60);
     doc.text(`Phone Number: ${userDetails.phone}`, 20, 70);
     doc.text(`Design Name: ${order.designName}`, 20, 80);
-    doc.text(`Price: $${finalPrice}`, 20, 90);
+    doc.text(`Price: $${order.price}`, 20, 90);
    
     doc.text(`Number of Colors: ${order.numberOfColors}`, 20, 110);
     doc.text(`Color Name: ${order.colorName}`, 20, 120);
     doc.text(`Height: ${order.height}`, 20, 130);
     doc.text(`Width: ${order.width}`, 20, 140);
     doc.text(`Fabric: ${order.fabric}`, 20, 150);
-    doc.text(`Expected Delivery: ${order.expectedDelivery}`, 20, 160);
+    doc.text(`Expected Delivery: ${order.expectedDelivery}` , 20, 160);
     doc.text(`Artwork URL: ${order.fileUrl}`, 20, 170);
     doc.text(`Comments: ${order.comments}`, 20, 180);
     doc.text(`Order Status: ${order.status}`, 20, 190);
@@ -250,78 +213,34 @@ const handleRushChange = async (orderId) => {
     doc.save(`invoice_${order.id}.pdf`);
   };
 
-  const updateOrderPrice = async (orderId, isRush) => {
-    try {
-        console.log('Updating order price for orderId:', orderId);
-
-        // Fetch the order directly by its ID
-        const orderRef = doc(db, 'orders', orderId); // Use the orderId directly
-        const orderSnapshot = await getDoc(orderRef);
-
-        if (!orderSnapshot.exists()) {
-            console.error("No order found for ID:", orderId);
-            return; // Return early if no order is found
-        }
-
-        // Get the order data
-        const orderData = { id: orderSnapshot.id, ...orderSnapshot.data() };
-        console.log('Fetched order data:', orderData);
-
-        // Ensure price is a number and handle rush logic
-        let newPrice = orderData.price; // Default price
-        if (isRush) {
-            newPrice += 5; // Increase price by $5 for rush order
-        }
-
-        // Update the order price in Firestore
-        await updateDoc(orderRef, { price: newPrice });
-        console.log(`Updated order price for order ID: ${orderData.id} to: ${newPrice}`);
-
-    } catch (error) {
-        console.error("Error updating order price:", error);
-    }
-};
-
 
 
 
 
   
 
-  const updateVectorPrice = async (id, isRush) => {
-    try {
-        const vectorRef = doc(db, 'vectors',id);
-        const vectorDoc = await getDoc(vectorRef);
-        
-        // Check if the document exists
-        if (!vectorDoc.exists()) {
-            console.error("Vector document does not exist.");
-            return; // Exit the function early
-        }
 
-        const vectorData = vectorDoc.data();
-        console.log("Fetching vector document for orderId:", id);
+const toggleOrderDetails = (orderId) => {
+  setExpandedOrder(expandedOrder === orderId ? null : orderId);
+};
 
-        // Ensure that price is a number before performing operations
-        if (typeof vectorData.price !== 'number') {
-            console.error("Price is not a number.");
-            return; // Exit the function early
-        }
-
-        const newPrice = isRush ? vectorData.price + 5 : vectorData.price - 5; // Adjust price
-
-        await updateDoc(vectorRef, {
-            price: newPrice,
-        });
-    } catch (error) {
-        console.error("Error updating vector price:", error);
-    }
+const toggleVectorDetails = (vectorId) => {
+  setExpandedVector(expandedVector === vectorId ? null : vectorId);
 };
     
   return (
     <div className="dashboard">
       <aside className={`sidebar   ${sidebarOpen ? 'active' : ''}`}>
-        <h2 className="text-gray-200 text-3xl font-helveticaLight">Client Panel</h2>
+        <Link to="/order">
+      <button
+     
+        className="w-full sm:w-1/2 md:w-3/4 lg:w-3/4 px-6 py-3 text-lg font-semibold text-white bg-blue-600 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition duration-300"
+      >
+        Click to Order Now
+      </button>
+      </Link>
+      
+        <h2 className="text-gray-200 md:text-3xl text-lg font-helveticaLight my-3">Client Panel</h2>
         <ul>
           <li 
             className={activeTab === 'quick-order'  ? 'active' : ''} 
@@ -364,217 +283,317 @@ const handleRushChange = async (orderId) => {
         </ul>
       </aside>
       <main className="main-content">
-        <button className="hamburger" onClick={toggleSidebar}>
+        {/* <button className="hamburger" onClick={toggleSidebar}>
           <FontAwesomeIcon icon={faBars} />
-        </button>
+        </button> */}
     
    
         
-        {activeTab === 'quick-order' && <QuickOrderForm    rushSelectedOrders={rushSelectedOrders} 
-            handleRushChange={handleRushChange}/>} {/* Render QuickOrderForm */}
-        {activeTab === 'quick-vector' && <Quickvectorform   rushSelectedVectors={rushSelectedVectors} 
-            handleRushChangevector={handleRushChangeVector} />} {/* Render QuickOrderForm */}
-        
+        {activeTab === 'quick-order' && <QuickOrderForm/>  }
+  
+        {activeTab === 'quick-vector' && <Quickvectorform/>}
         {activeTab === 'order-records' && (
-          <>
-            <h3>Your Orders</h3>
-            {loading ? (
-              <p>Loading orders...</p>
-            ) : (
-              <ul>
-              {orders.length > 0 ? (
-  orders.map((order) => {
-    const finalPrice = order.price + (rushSelectedOrders[order.id] ? 5 : 0); // Adjust price if Rush is selected
+        <>
+     
+          {loading ? (
+            <p>Loading orders...</p>
+          ) : (
+            <>
+              <h2>Order Records</h2>
+              <div className="table-responsive ">
+              <div class="table-container">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Order ID</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Customer Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Company Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Phone</th> {/* Phone column added */}
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Design Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Location</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Rush Job</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Order Date</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <React.Fragment key={order.id}>
+                      <tr>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.id}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.fullName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.email}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.company}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.phone}</td> {/* Display phone */} 
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>${order.price}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.designName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.location}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.isRush ? 'Yes' : 'No'}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.createdAt.toDate().toLocaleDateString()}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                          <button onClick={() => toggleOrderDetails(order.id)}>
+                            {expandedOrder === order.id ? 'Hide Details' : 'Show Details'}
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedOrder === order.id && (
+                        <tr>
+                          <td colSpan="10" style={{ padding: '8px', backgroundColor: '#f9f9f9' }}>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Number of Colors: {order.numberOfColors}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Height: {order.height}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Width: {order.width}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Fabric: {order.fabric}</p>
+                            <p className='font-bold md:text-[15px] text-[10px] font-raleway'>Expected Delivery: {order.expectedDelivery}</p>
+                            <p>Artwork:</p> <a className='text-[11px] md:text-[15px]' href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Format: {order.format}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Comments: {order.comments}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Status: {order.status}</p>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
 
-    return (
-      <div className="order-card" key={order.id}>
-        <strong>Order ID:</strong> {order.id} <br />
-        <strong>Email:</strong> {order.customerEmail} <br />
-        <strong>Full Name:</strong> {order.customerName} <br />
-        <strong>Company Name:</strong> {order.companyname} <br />
-        <strong>Phone Number:</strong> {order.phone} <br />
-        <strong>Design Name:</strong> {order.designName} <br />
-        <strong>Location:</strong> {order.location} <br />
-        <strong>Price:</strong> ${finalPrice} <br /> {/* Use finalPrice here */}
-        <strong>Number Of Colors:</strong> {order.numberOfColors} <br />
-        <strong>Color Name:</strong> {order.colorName} <br />
-        <strong>Height:</strong> {order.height} <br />
-        <strong>Width:</strong> {order.width} <br />
-        <strong>Fabric:</strong> {order.fabric} <br />
-        <strong>Format:</strong> {order.format} <br />
-        <strong>Expected Delivery:</strong> {order.expectedDelivery} <br />
-        <strong>Artwork:</strong> <a href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
-        <strong>Comment:</strong> {order.comments} <br />
-        <strong>Order Status:</strong> {order.status} <br /> {/* Order Status Field */}
-        <strong>Order Date:</strong> {order.createdAt.toDate().toLocaleDateString()}
-        <label className='flex '>
-          <input 
-            type="checkbox" 
-            checked={rushSelectedOrders[order.id] || false}
-            onChange={() => handleRushChange(order.id)}
-          />
-          Rush (+$5)
-        </label>
-
-      
-      </div>
-    );
-  })
-) : (
-  <p>No orders found.</p>
-)}
-
-</ul>
-  )}
-  </>
-        )}
 
 {activeTab === 'vector-records' && (
-          <>
-            <h3>Your Vectors</h3>
-            {loading ? (
-              <p>Loading orders...</p>
-            ) : (
-              <ul>
-              {vector.length > 0 ? (
-  vectors.map((order) => {
-    const finalPrice = order.price + (rushSelectedVectors[order.id] ? 5 : 0);  // Adjust price if Rush is selected
-
-    return (
-      <div className="order-card" key={order.id}>
-        <strong>Vector ID:</strong> {order.id} <br />
-        <strong>Email:</strong> {order.customerEmail} <br />
-        <strong>Full Name:</strong> {order.customerName} <br />
-        <strong>Company Name:</strong> {order.companyname} <br />
-        <strong>Phone Number:</strong> {order.phone} <br />
-        <strong>Design Name:</strong> {order.designName} <br />
+        <>
      
-        <strong>Price:</strong> ${finalPrice} <br /> {/* Use finalPrice here */}
-        <strong>Number Of Colors:</strong> {order.location} <br />
-        <strong>Color Name:</strong> {order.colorName} <br />
-        <strong>Height:</strong> {order.height} <br />
-        <strong>Width:</strong> {order.width} <br />
-        <strong>Format:</strong> {order.format} <br />
-        <strong>Expected Delivery:</strong> {order.expectedDelivery} <br />
-        <strong>Artwork:</strong> <a href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
-        <strong>Comment:</strong> {order.comments} <br />
-        <strong>vector Status:</strong> {order.status} <br /> {/* Order Status Field */}
-     
-        <label className='flex '>
-          <input 
-            type="checkbox" 
-            checked={rushSelectedVectors[order.id] || false} 
-            onChange={() => handleRushChangeVector(order.id)}
-          />
-          Rush (+$5)
-        </label>
-      
-      </div>
-    );
-  })
-) : (
-  <p>No orders found.</p>
-)}
+          {loading ? (
+            <p>Loading orders...</p>
+          ) : (
+            <>
+              <h2>Vectors Records</h2>
+              <div className="table-responsive ">
+              <div class="table-container">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>vector ID</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Customer Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Company Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Phone</th> {/* Phone column added */}
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Design Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>no of colors</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Rush Job</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Order Date</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vectors.map((order) => (
+                    <React.Fragment key={order.id}>
+                      <tr>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.id}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.fullName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.email}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.company}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.phone}</td> {/* Display phone */} 
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>${order.price}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.designName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.location}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.isRush ? 'Yes' : 'No'}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.createdAt.toDate().toLocaleDateString()}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                          <button onClick={() => toggleVectorDetails(order.id)}>
+                            {expandedVector === order.id ? 'Hide Details' : 'Show Details'}
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedVector === order.id && (
+                        <tr>
+                          <td colSpan="10" style={{ padding: '8px', backgroundColor: '#f9f9f9' }}>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>colorname: {order.colorName}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Height: {order.height}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Width: {order.width}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Format: {order.format}</p>
+                            <p className='font-bold md:text-[15px] text-[10px] font-raleway'>Expected Delivery: {order.expectedDelivery}</p>
+                            <p>Artwork:</p> <a className='text-[11px] md:text-[15px]' href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
 
-</ul>
-  )}
-  </>
-        )}
-{activeTab === 'invoice' && (
-          <>
-            <h3>Your Order Invoices</h3>
-            {loading ? (
-              <p>Loading invoices...</p>
-            ) : (
-              <ul>
-                {orders.length > 0 ? (
-                  orders.map((order) => {
-                    const finalPrice = order.price + (rushSelectedOrders[order.id] ? 5 : 0); 
-                    return(// Adjust price if Rush is selected
-                
-                    <div className="invoice-card" key={order.id}>
-                      <strong>Invoice for Order ID:</strong> {order.id} <br />
-                      <strong>Email:</strong> {order.customerEmail} <br />
-                      <strong>Full Name:</strong> {order.customerName} <br />
-                      <strong>Company Name:</strong> {order.companyname} <br />
-                      <strong>Phone Number:</strong> {order.phone} <br />
-                      <strong>Design Name:</strong> {order.designName} <br />
-                      <strong>Location:</strong> {order.location} <br />
-                      <strong>Price:</strong> ${finalPrice} <br />
-                      <strong>Number Of Colors:</strong> {order.numberOfColors} <br />
-                      <strong>Color Name:</strong> {order.colorName} <br />
-                      <strong>Height:</strong> {order.height} <br />
-                      <strong>Width:</strong> {order.width} <br />
-                      <strong>Fabric:</strong> {order.fabric} <br />
-                      <strong>Expected Delivery:</strong> {order.expectedDelivery} <br />
-                      <strong>Artwork:</strong> <a href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
-                      <strong>Comment:</strong> {order.comments} <br />
-                      <strong>Order Status:</strong> {order.status} <br /> {/* Order Status Field */}
-                      <strong>Order Date:</strong> {order.createdAt.toDate().toLocaleDateString()}
-                      <button 
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Comments: {order.comments}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Status: {order.status}</p>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+ {activeTab === 'invoice' && (
+        <>
+     
+          {loading ? (
+            <p>Loading orders...</p>
+          ) : (
+            <>
+              <h2>Order Invoices</h2>
+              <div className="table-responsive ">
+              <div class="table-container">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Order ID</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Customer Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Company Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Phone</th> {/* Phone column added */}
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Design Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Location</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Rush Job</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Order Date</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {orders.map((order) => (
+                    <React.Fragment key={order.id}>
+                      <tr>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.id}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.fullName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.email}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.company}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.phone}</td> {/* Display phone */} 
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>${order.price}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.designName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.location}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.isRush ? 'Yes' : 'No'}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.createdAt.toDate().toLocaleDateString()}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                          <button onClick={() => toggleOrderDetails(order.id)}>
+                            {expandedOrder === order.id ? 'Hide Details' : 'Show Details'}
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedOrder === order.id && (
+                        <tr>
+                         <td colSpan="10" style={{ padding: '8px', backgroundColor: '#f9f9f9' }}>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Number of Colors: {order.numberOfColors}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Height: {order.height}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Width: {order.width}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Fabric: {order.fabric}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Format: {order.format}</p>
+                            <p className='font-bold md:text-[15px] text-[10px] font-raleway'>Expected Delivery: {order.expectedDelivery}</p>
+                            <p>Artwork:</p> <a className='text-[11px] md:text-[15px]' href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
+
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Comments: {order.comments}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Status: {order.status}</p>
+                          </td>
+                  
+                          <button 
                 onClick={() => generateInvoice(order)} 
                 className="download-button"
               >
                 Download Invoice
               </button>
-
-                    </div>
-                    )
-})
-                ) : (
-                  <p>No invoices found.</p>
-                )}
-                </ul>
-            )}
-          </>
-        )}
-        {activeTab === 'invoicevector' && (
-          <>
-            <h3>Your Vector Invoices</h3>
-            {loading ? (
-              <p>Loading invoices...</p>
-            ) : (
-              <ul>
-                {vectors.length > 0 ? (
-                  vectors.map((order) => {
-                    const finalPrice = order.price + (rushSelectedVectors[order.id] ? 5 : 0); 
-                    return(// Adjust price if Rush is selected
-                
-                    <div className="invoice-card" key={order.id}>
-                        <strong>Vector ID:</strong> {order.id} <br />
-        <strong>Email:</strong> {order.customerEmail} <br />
-        <strong>Full Name:</strong> {order.customerName} <br />
-        <strong>Company Name:</strong> {order.companyname} <br />
-        <strong>Phone Number:</strong> {order.phone} <br />
-        <strong>Design Name:</strong> {order.designName} <br />
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
+      {activeTab === 'invoicevector' && (
+        <>
      
-        <strong>Price:</strong> ${finalPrice} <br /> {/* Use finalPrice here */}
-        <strong>Number Of Colors:</strong> {order.location} <br />
-        <strong>Color Name:</strong> {order.colorName} <br />
-        <strong>Height:</strong> {order.height} <br />
-        <strong>Width:</strong> {order.width} <br />
-        <strong>Format:</strong> {order.format} <br />
-        <strong>Expected Delivery:</strong> {order.expectedDelivery} <br />
-        <strong>Artwork:</strong> <a href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
-        <strong>Comment:</strong> {order.comments} <br />
-        <strong>vector Status:</strong> {order.status} <br />
-                      <button 
+          {loading ? (
+            <p>Loading vectors...</p>
+          ) : (
+            <>
+              <h2>vector Invoices</h2>
+              <div className="table-responsive ">
+              <div class="table-container">
+              <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                <thead>
+                  <tr>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>vector ID</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Customer Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Email</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Company Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Phone</th> {/* Phone column added */}
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Price</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Design Name</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>no of colors</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Rush Job</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Order Date</th>
+                    <th style={{ border: '1px solid #ddd', padding: '8px' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {vectors.map((order) => (
+                    <React.Fragment key={order.id}>
+                      <tr>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.id}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.fullName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.email}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.company}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{userDetails.phone}</td> {/* Display phone */} 
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>${order.price}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.designName}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.location}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.isRush ? 'Yes' : 'No'}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>{order.createdAt.toDate().toLocaleDateString()}</td>
+                        <td style={{ border: '1px solid #ddd', padding: '8px' }}>
+                          <button onClick={() => toggleVectorDetails(order.id)}>
+                            {expandedVector === order.id ? 'Hide Details' : 'Show Details'}
+                          </button>
+                        </td>
+                      </tr>
+                      {expandedVector === order.id && (
+                        <tr>
+                         <td colSpan="10" style={{ padding: '8px', backgroundColor: '#f9f9f9' }}>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>ColorName: {order.colorName}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Height: {order.height}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Width: {order.width}</p>
+
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Format: {order.format}</p>
+                            <p className='font-bold md:text-[15px] text-[10px] font-raleway'>Expected Delivery: {order.expectedDelivery}</p>
+                            <p>Artwork:</p> <a className='text-[11px] md:text-[15px]' href={order.fileUrl} target="_blank" rel="noopener noreferrer">{order.fileUrl}</a> <br />
+
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Comments: {order.comments}</p>
+                            <p className='font-bold md:text-[15px] text-[12px] font-raleway'>Status: {order.status}</p>
+                          </td>
+                  
+                          <button 
                 onClick={() => generateInvoicevector(order)} 
                 className="download-button"
               >
                 Download Invoice
               </button>
-
-                    </div>
-                    )
-})
-                ) : (
-                  <p>No invoices found.</p>
-                )}
-                </ul>
-            )}
-          </>
-        )}
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+              </div>
+              </div>
+            </>
+          )}
+        </>
+      )}
        
        
 
